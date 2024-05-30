@@ -1,0 +1,30 @@
+.hero-header {
+    background-color: #007bff;
+    /* or any other color */
+    color: #fff;
+    padding: 60px 0;
+    /* background-image: url('/path-to-background-image.jpg'); */
+    /* optional */
+    background-size: cover;
+    background-position: center;
+}
+
+.display-4 {
+    font-weight: bold;
+}
+
+.lead {
+    font-size: 1.25rem;
+}
+
+button {
+    font-size: 1rem;
+    padding: 10px 20px;
+}
+
+/* Add responsive behavior if needed */
+@media (max-width: 768px) {
+    .hero-header {
+        padding: 40px 0;
+    }
+}

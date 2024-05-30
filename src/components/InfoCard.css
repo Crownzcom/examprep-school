@@ -1,0 +1,16 @@
+.InfoCard-container {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.InfoCard-card {
+    width: 100%;
+    max-width: 600px;
+}
+
+.InfoCard-icon {
+    color: #f0ad4e;
+    /* Bootstrap warning color */
+}

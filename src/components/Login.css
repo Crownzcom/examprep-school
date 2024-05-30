@@ -1,0 +1,22 @@
+.login-background {
+    background: linear-gradient(135deg, #5f6061 0%, #83b4b6 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* .login-background {
+    background-image: url('../images/bkgrnd1.png') !important;
+    background-size: cover;
+    background-position: center;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+} */
+
+.login-container {
+    /* margin-top: 100px; */
+}

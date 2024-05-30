@@ -1,0 +1,23 @@
+/* DragAndDropQuestion.css */
+.droppable-container {
+    display: flex;
+    padding: 8px;
+    border: 1px solid #ccc;
+    min-height: 50px;
+    flex: 1;
+}
+
+.draggable-item {
+    /* user-select: none; */
+    padding: 8px;
+    margin: 0 8px 0 0;
+}
+
+.draggable-item.dragging {
+    background-color: #456C86;
+    color: white;
+}
+
+.dropped-item {
+    background-color: #D3D3D3;
+}

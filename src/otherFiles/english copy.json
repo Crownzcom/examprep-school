@@ -1,0 +1,206 @@
+[
+    {
+        "Section A": [
+            {
+                "instructions": "In each of the questions 1 to 5, fill in the blank space with a suitable word.",
+                "category": "fillBlank",
+                "questions": [
+                    {
+                        "question": "How <input type='text' id='textInput'> does a bottle of soda cost?",
+                        "answer": "much"
+                    },
+                    {
+                        "question": "I would <input type='text' id='textInput'> be a carpenter than a tailor.",
+                        "answer": "rather"
+                    }
+                ]
+            },
+            {
+                "instructions": "In each of the questions 6 to 15, use the correct form of the word given in the brackets to complete the sentence.",
+                "category": "givenBlank",
+                "questions": [
+                    {
+                        "question": "If Ayupo had <input type='text' id='textInput'> to kalangala, she would have eaten a lot of fish. (go)",
+                        "answer": "gone"
+                    },
+                    {
+                        "question": "In Kampala, motorcycles move <input type='text' id='textInput'> than cars. (fast)",
+                        "answer": "faster"
+                    }
+                ]
+            },
+            {
+                "instructions": "In each of the questions 16 to 17, drag and drop the given words in alphabetical order.",
+                "category": "alphabetical",
+                "questions": [
+                    {
+                        "words_to_drag": [
+                            "receive",
+                            "respect",
+                            "receipt",
+                            "restaurant"
+                        ],
+                        "correctOrder": [
+                            2,
+                            0,
+                            3,
+                            1
+                        ]
+                    }
+                ]
+            },
+            {
+                "instructions": "In each of the questions 18 to 20, give one word for the underlined group of words.",
+                "category": "underlined",
+                "questions": [
+                    {
+                        "question": "The cleanest <u>man who sells meat</u> in our village was arrested.",
+                        "answer": "butcher"
+                    },
+                    {
+                        "question": "You must <u>take back</u> that book to the library after reading it.",
+                        "answer": "return"
+                    }
+                ]
+            },
+            {
+                "instructions": "In each of the questions 21 to 22, choose the sentence where the given word is used correctly.",
+                "category": "multiple_choice",
+                "questions": [
+                    {
+                        "question": "sauce",
+                        "options": [
+                            "She had a sauce of inspiration for her artwork.",
+                            "I need to put sauce on my shoes.",
+                            "Mom prepared a delicious spaghetti sauce for dinner.",
+                            "He likes to sauce the soccer ball into the net."
+                        ],
+                        "answer": "Mom prepared a delicious spaghetti sauce for dinner."
+                    },
+                    {
+                        "question": "source",
+                        "options": [
+                            "The library is an important sauce of knowledge.",
+                            "We need to find a source to fix the car.",
+                            "He likes to source the books at the bookstore.",
+                            "The internet is a great source of information."
+                        ],
+                        "answer": "The internet is a great source of information."
+                    }
+                ]
+            },
+            {
+                "instructions": "In each of the questions 23 to 24, write the full form of the given abbreviation.",
+                "category": "abbreviation",
+                "questions": [
+                    {
+                        "question": "doz",
+                        "answer": "dozen"
+                    },
+                    {
+                        "question": "vs",
+                        "answer": "versus"
+                    }
+                ]
+            },
+            {
+                "instructions": "In each of the questions 25 to 26, drag and drop the given words to from a sentence.",
+                "category": "sentence",
+                "questions": [
+                    {
+                        "words_to_drag": [
+                            "the",
+                            "sauce.",
+                            "tasted",
+                            "She"
+                        ],
+                        "correctOrder": [
+                            3,
+                            2,
+                            0,
+                            1
+                        ]
+                    },
+                    {
+                        "words_to_drag": [
+                            "unknown.",
+                            "is",
+                            "The",
+                            "source"
+                        ],
+                        "correctOrder": [
+                            2,
+                            3,
+                            1,
+                            0
+                        ]
+                    }
+                ]
+            },
+            {
+                "instructions": "In each of the questions 27 to 28, give the opposite of the underlined word(s) or given word.",
+                "category": "opposite",
+                "questions": [
+                    {
+                        "question": "Are all the mangoes in your basket <u>raw</u> ?",
+                        "answer": "ripe"
+                    },
+                    {
+                        "question": "There are many people who are employed in <u>rural</u> areas.",
+                        "answer": "urban"
+                    }
+                ]
+            },
+            {
+                "instructions": "In each of the questions 29 to 30, give the plural of the underlined or given word(s).",
+                "category": "plural",
+                "questions": [
+                    {
+                        "question": "Tooth",
+                        "answer": "teeth"
+                    }
+                ]
+            },
+            {
+                "instructions": "In each of the questions 31 to 50, choose the sentence with the correct rewritten option according to the instruction provided in the brackets.",
+                "category": "rewriteMultiplechoice",
+                "questions": [
+                    {
+                        "question": "Isabella's handwriting is very good. Sam's handwriting is good. (Rewrite as one sentence using:....as....as....)",
+                        "options": [
+                            "Isabella's handwriting is not as good as Sam's.",
+                            "Isabella's handwriting is not as very good as Sam's.",
+                            "Isabella's handwriting is as good as Sam's.",
+                            "Isabella's handwriting is as better as Sam's."
+                        ],
+                        "answer": "Isabella's handwriting is as good as Sam's."
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "Section B": [
+            {
+                "category": "51",
+                "questions": [
+                    "https://v1q1.c10.e2-4.dev/exam-prep/primaryseven/English/51/2005/index.html",
+                    "https://v1q1.c10.e2-4.dev/exam-prep/primaryseven/English/51/2006/index.html",
+                    "https://v1q1.c10.e2-4.dev/exam-prep/primaryseven/English/51/2007/index.html",
+                    "https://v1q1.c10.e2-4.dev/exam-prep/primaryseven/English/51/2008/index.html",
+                    "https://v1q1.c10.e2-4.dev/exam-prep/primaryseven/English/51/2009/index.html"
+                ]
+            },
+            {
+                "category": "52",
+                "questions": [
+                    "https://v1q1.c10.e2-4.dev/exam-prep/primaryseven/English/52/2005/index.html",
+                    "https://v1q1.c10.e2-4.dev/exam-prep/primaryseven/English/52/2006/index.html",
+                    "https://v1q1.c10.e2-4.dev/exam-prep/primaryseven/English/52/2007/index.html",
+                    "https://v1q1.c10.e2-4.dev/exam-prep/primaryseven/English/52/2008/index.html",
+                    "https://v1q1.c10.e2-4.dev/exam-prep/primaryseven/English/52/2009/index.html"
+                ]
+            }
+        ]
+    }
+]

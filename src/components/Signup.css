@@ -1,0 +1,35 @@
+.signup-background {
+    background: linear-gradient(135deg, #5f6061 0%, #83b4b6 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* padding: 20px; */
+}
+
+/* .signup-background {
+    background-image: url('../images/bkgrnd1.png') !important;
+    background-size: cover;
+    background-position: center;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+} */
+
+.signup-container {
+    /* margin-top: 100px; */
+    margin-bottom: -30px;
+}
+
+/* You might want to style the card or container of your form to make it stand out from the background */
+.signup-card {
+    background: #fbffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(185, 183, 183, 0.15);
+    /* padding: 30px; */
+    /* max-width: 400px; */
+    /* or your preferred width */
+    /* width: 100%; */
+}

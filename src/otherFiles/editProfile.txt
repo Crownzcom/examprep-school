@@ -1,0 +1,37 @@
+Student/Parent
+----------
+table
+----------
+firstName
+lastName
+otherName
+gender
+phone
+email address
+schoolName
+schoolAddress
+educationLevel (*to be considered later*)
+kinId (when deleted/removed, sets to null)
+--------
+account
+--------
+Name
+Email
+Phone
+Password
+Labels (student, kin)
+
+----
+{
+    "label": "student",
+    "userId": "65ba4521839c4bca7ff1",
+    "userDocId": "65ba452400be5d85c571",
+    "firstName": "Johnr",
+    "lastName": "Doer",
+    "otherName": "crfref",
+    "gender": "Female",
+    "email": "stud1@stud.studfer",
+    "phone": "+256700000000",
+    "schoolName": "ABCre",
+    "schoolAddress": "POBox123ref"
+}

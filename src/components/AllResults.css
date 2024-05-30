@@ -1,0 +1,20 @@
+.hero-header h1 {
+    font-size: 3rem;
+    /* Even larger font size for the title */
+}
+
+.hero-header p {
+    font-size: 1.4rem;
+    /* Increased font size for the subtitle */
+    margin-bottom: 1.5rem;
+    /* Space before buttons */
+}
+
+.hero-header .btn {
+    font-size: 1.1rem;
+    /* Larger font size for buttons */
+    padding: 0.5rem 1rem;
+    /* Padding around buttons */
+    margin: 0 0.5rem;
+    /* Space between buttons */
+}

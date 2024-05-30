@@ -1,0 +1,17 @@
+.buttonGroupFlex {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    /* Aligns items vertically */
+}
+
+.buttonGroupFlex button {
+    flex-grow: 1;
+    /* Allows buttons to grow and take up equal space */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    /* Ensures text does not overflow */
+    font-size: 1rem;
+    /* Adjust as needed */
+}

@@ -1,0 +1,225 @@
+{
+    "PLE": [
+        {
+            "id": "sci-ple",
+            "name": "Science",
+            "description": "Explore the world of natural sciences and discover the principles of life.",
+            "icon": "faMicroscope",
+            "color": "#0fc9b0"
+        },
+        {
+            "id": "mtc-ple",
+            "name": "Mathematics",
+            "description": "Engage with numbers and develop your mathematical problem-solving skills.",
+            "icon": "faCalculator",
+            "color": "#ecb500"
+        },
+        {
+            "id": "sst-ple",
+            "name": "Social Studies",
+            "description": "Understand the structure of society and learn about different cultures.",
+            "icon": "faGlobeAmericas",
+            "color": "#7B68EE"
+        },
+        {
+            "id": "eng-ple",
+            "name": "English Language",
+            "description": "Dive into the depths of English literature and grammar.",
+            "icon": "faBookOpen",
+            "color": "#11726d"
+        }
+    ],
+    "UCE": [
+        {
+            "id": "eng-uce",
+            "name": "English Language",
+            "description": "Master the global language and enhance your communication skills.",
+            "icon": "faBookOpen",
+            "color": "#4bc0c0"
+        },
+        {
+            "id": "mtc-uce",
+            "name": "Mathematics",
+            "description": "Challenge yourself with numbers and equations.",
+            "icon": "faCalculator",
+            "color": "#e05823"
+        },
+        {
+            "id": "bio-uce",
+            "name": "Biology",
+            "description": "Discover the science of life and living organisms.",
+            "icon": "faDna",
+            "color": "#4cbb7e"
+        },
+        {
+            "id": "che-uce",
+            "name": "Chemistry",
+            "description": "Learn about substances, their properties, and reactions.",
+            "icon": "faFlask",
+            "color": "#DA70D6"
+        },
+        {
+            "id": "phy-uce",
+            "name": "Physics",
+            "description": "Understand the fundamental principles governing the natural world.",
+            "icon": "faAtom",
+            "color": "#FF6347"
+        },
+        {
+            "id": "his-uce",
+            "name": "History & Political Education",
+            "description": "Explore the events of the past and how they shape the future.",
+            "icon": "faLandmark",
+            "color": "#4682B4"
+        },
+        {
+            "id": "geo-uce",
+            "name": "Geography",
+            "description": "Study the Earth, its features, and its various inhabitants.",
+            "icon": "faMountain",
+            "color": "#8a6c46"
+        },
+        {
+            "id": "com-uce",
+            "name": "Commerce",
+            "description": "Learn the basics of trade, business, and economics.",
+            "icon": "faChartLine",
+            "color": "#BC8F8F"
+        },
+        {
+            "id": "art-uce",
+            "name": "Art and Design",
+            "description": "Express your creativity and learn the principles of visual composition.",
+            "icon": "faPalette",
+            "color": "#9b4350"
+        },
+        {
+            "id": "agr-uce",
+            "name": "Agriculture",
+            "description": "Study the science of farming, including cultivation of soil for growing crops.",
+            "icon": "faSeedling",
+            "color": "#32CD32"
+        },
+        {
+            "id": "re-uce",
+            "name": "Religious Education",
+            "description": "Explore the diverse religions of the world and their cultural impacts.",
+            "icon": "faPray",
+            "color": "#9c4260"
+        },
+        {
+            "id": "lit-uce",
+            "name": "Literature in English",
+            "description": "Delve into the rich world of English literature and analyze texts from different periods",
+            "icon": "faBookReader",
+            "color": "#e7944b"
+        },
+        {
+            "id": "forLang-uce",
+            "name": "Foreign Languages",
+            "description": "Learn a new language and open up to a world of cultural experiences.",
+            "icon": "faLanguage",
+            "color": "#399dbe"
+        },
+        {
+            "id": "comp-uce",
+            "name": "Computer Studies",
+            "description": "Discover the world of computing, from software to hardware and networking.",
+            "icon": "faComputer",
+            "color": "#ff9900"
+        },
+        {
+            "id": "phyEduc-uce",
+            "name": "Physical Education",
+            "description": "Improve your physical fitness and learn the importance of maintaining a healthy lifestyle.",
+            "icon": "faRunning",
+            "color": "#0fc9b0"
+        }
+    ],
+    "UACE": [
+        {
+            "id": "his-uace",
+            "name": "History & Political Education",
+            "description": "Analyze and interpret significant historical events and eras.",
+            "icon": "faLandmark",
+            "color": "#ff9f40"
+        },
+        {
+            "id": "geo-uace",
+            "name": "Geography",
+            "description": "Investigate the physical properties of Earth and its atmosphere.",
+            "icon": "faMountain",
+            "color": "#817611"
+        },
+        {
+            "id": "div-uace",
+            "name": "Divinity",
+            "description": "Investigate the theological studies of religious beliefs and practices.",
+            "icon": "faBible",
+            "color": "#702570"
+        },
+        {
+            "id": "econ-uace",
+            "name": "Economics",
+            "description": "Understand the production, distribution, and consumption of goods and services.",
+            "icon": "faChartLine",
+            "color": "#ad3729"
+        },
+        {
+            "id": "litEng-uace",
+            "name": "Literature in English",
+            "description": "Explore the profound depths of English literature and its historical contexts.",
+            "icon": "faBookReader",
+            "color": "#FFA500"
+        },
+        {
+            "id": "ent-uace",
+            "name": "Entrepreneurship",
+            "description": "Learn the essentials of starting a business and becoming a successful entrepreneur.",
+            "icon": "faLightbulb",
+            "color": "#FF4500"
+        },
+        {
+            "id": "msc-uace",
+            "name": "Music",
+            "description": "Study the art of music, including theory, performance, and history.",
+            "icon": "faMusic",
+            "color": "#6A5ACD"
+        },
+        {
+            "id": "phyEduc-uace",
+            "name": "Physical Education",
+            "description": "Engage in physical activities and sports to promote health and fitness.",
+            "icon": "faFootballBall",
+            "color": "#1E90FF"
+        },
+        {
+            "id": "mtc-uace",
+            "name": "Mathematics",
+            "description": "Challenge your analytical skills with advanced mathematical concepts.",
+            "icon": "faSquareRootAlt",
+            "color": "#3CB371"
+        },
+        {
+            "id": "comp-uace",
+            "name": "Computer Studies",
+            "description": "Delve deeper into computer science, coding, and information technology.",
+            "icon": "faComputer",
+            "color": "#c4a706"
+        },
+        {
+            "id": "td-uace",
+            "name": "Technical Drawing",
+            "description": "Develop drafting skills for creating detailed plans and drawings for buildings or machinery.",
+            "icon": "faPencilRuler",
+            "color": "#A52A2A"
+        },
+        {
+            "id": "gp-uace",
+            "name": "General Paper",
+            "description": "",
+            "icon": "faSpellCheck",
+            "color": "#384743"
+        }
+    ]
+}

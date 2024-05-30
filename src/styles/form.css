@@ -1,0 +1,27 @@
+.phone-input .form-control {
+    border: 1px solid #ced4da;
+    /* Match Bootstrap's default styling */
+    padding: .375rem .75rem;
+    /* Match Bootstrap's default padding */
+    height: calc(1.5em + .75rem + 2px);
+    /* Match Bootstrap's default height */
+}
+
+/* Style the country select dropdown */
+.phone-input .flag-dropdown {
+    border: none;
+    /* Remove any default border */
+    background: transparent;
+    /* Set a transparent background or match with the form's background */
+    /* Other styles to match your design */
+}
+
+/* Style the country select button */
+.phone-input .country-select-button {
+    /* Styles to match the design of other buttons or inputs in your form */
+}
+
+/* Custom styles for the country list */
+.phone-input .country-list {
+    /* Styles for the dropdown country list */
+}

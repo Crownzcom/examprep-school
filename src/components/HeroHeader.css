@@ -1,0 +1,7 @@
+.hero-header {
+    background: linear-gradient(45deg, #033866, #167477);
+    min-height: 50vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

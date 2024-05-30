@@ -1,0 +1,10 @@
+/* TextInputQuestion.module.css */
+.bottomBorder {
+    border: 5px solid;
+    border-bottom: 2px solid red;
+    /* Solid black border at the bottom */
+    display: inline-block;
+    /* Makes the div wrap tightly around the Form.Control */
+    width: 100%;
+    /* Ensures it takes the full width */
+}

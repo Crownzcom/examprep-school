@@ -1,0 +1,39 @@
+/* MultipleChoiceQuestion.css */
+.custom-radio .form-check-input {
+    opacity: 0;
+    /* Hide the default radio button */
+    position: absolute;
+}
+
+.custom-radio .form-check-label {
+    position: relative;
+    padding-left: 2rem;
+    /* Space for custom radio button */
+    cursor: pointer;
+}
+
+.custom-radio .form-check-label::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 20px;
+    width: 20px;
+    background-color: #fff;
+    border: 2px solid rgb(12, 0, 99);
+    border-radius: 50%;
+    box-sizing: border-box;
+}
+
+.custom-radio .form-check-input:checked+.form-check-label::after {
+    content: "";
+    position: absolute;
+    left: 4.2px;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 12px;
+    width: 12px;
+    background-color: rgb(0, 26, 221);
+    border-radius: 50%;
+}
