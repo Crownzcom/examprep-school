@@ -4,25 +4,21 @@ import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit, faUserCircle, faCoins, faArrowUp, faArrowCircleUp } from "@fortawesome/free-solid-svg-icons";
 import { Container, Row, Col, Button, Alert, Badge, Card } from "react-bootstrap";
-import storageUtil from "../utilities/storageUtil";
 import { useAuth } from "../context/AuthContext";
 import "../animations.css";
 import HeroHeader from "./HeroHeader";
 import "./Home.css";
 import StudentDashboard from "./dashboard/StudentDashboard";
-import NextOfKinDashboard from "./dashboard/NextOfKinDashboard";
 import AdminDashboard from "./dashboard/AdminDashboard";
-import { fetchStudents, fetchTransactions } from "../utilities/fetchStudentData";
+import { fetchStudents } from "../utilities/fetchStudentData";
 
 function Home() {
   const navigate = useNavigate();
-  const { userInfo, userPoints, updateUserPoints, fetchUserPoints, updateQuestionSubjectData } = useAuth();
+  const { userInfo, updateQuestionSubjectData } = useAuth();
   // const userInfo = storageUtil.getItem("userInfo");
-  const isStudent = userInfo.labels.includes("student");
-  const isNextOfKin = userInfo.labels.includes("kin");
-  const isAdmin = userInfo.labels.includes("admin");
-  const isSales = userInfo.labels.includes("sales") || userInfo.labels.includes("admin");
-  const isDev = userInfo.labels.includes("dev")
+  const isStudent = userInfo.userType === "student";
+  const isAdmin = userInfo.userType === "admin";
+  const isDev = userInfo.userType === "dev"
 
   //FETCH EXAMS AND SAVE IN INDEX DB
   useEffect(() => {
@@ -39,26 +35,19 @@ function Home() {
   const testFunc = async () => {
     //Fetch all students data
     console.log("Checking whether user is an admin or staff");
-    if (userInfo.labels.includes("admin") || userInfo.labels.includes("staff") || userInfo.labels.includes("dev")) {
+    if (userInfo.userType === 'admin' || userInfo.userType === "dev") {
       console.log('Fetching student data');
       await fetchStudents().then(data => {
         console.log('Students data Fetch successfully');
       }).catch(error => {
         console.error('Failed to fetch students');
       });
-
-      console.log('Fetching transactions data');
-      await fetchTransactions().then(data => {
-        console.log('Transactions data Fetch successfully');
-      }).catch(error => {
-        console.error('Failed to fetch transactions data');
-      });
     }
   }
 
   const testFunc2 = async () => {
     //saving qtns to db
-    if (userInfo.labels.includes('student')) {
+    if (userInfo.userType === 'student') {
       try {
         await updateQuestionSubjectData(userInfo.subjects, userInfo.userId, userInfo.educationLevel)
       } catch (error) {
@@ -88,6 +77,39 @@ function Home() {
               <FontAwesomeIcon icon={faUserCircle} /> View Profile
             </Button>
           </Col>
+
+          {/* ADMIN FEATURES */}
+          <div className="container mt-4">
+            {isAdmin && (
+              <>
+                <h3 className="mb-4 text-center">ADMIN Mode</h3>
+                <div className="row justify-content-center">
+                  <div className="col-md-4 mb-4">
+                    <Card className="text-center">
+                      <Card.Body>
+                        <Button variant="outline-primary" onClick={() => navigate('/sechedule-exam')}>
+                          <FontAwesomeIcon icon={faArrowCircleUp} className="me-2" />
+                          Schedule Exam
+                        </Button>
+                      </Card.Body>
+                    </Card>
+                  </div>
+
+                  {/* Additional cards can be added here following the same pattern */}
+                  {/* Example additional card */}
+                  <div className="col-md-4 mb-4">
+                    <Card className="text-center">
+                      <Card.Header as="h5">Additional Feature</Card.Header>
+                      <Card.Body>
+                        <Card.Text>More developer features here.</Card.Text>
+                        <Button variant="outline-secondary" onClick={testFunc2}>Activate Feature</Button>
+                      </Card.Body>
+                    </Card>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
           {isStudent && (
             <>
               <Col md="auto">
@@ -106,22 +128,6 @@ function Home() {
                             <Button variant="outline-primary" onClick={() => testFunc()}>
                               <FontAwesomeIcon icon={faArrowCircleUp} className="me-2" />
                               Initiate IndexDB
-                            </Button>
-                          </Card.Body>
-                        </Card>
-                      </div>
-
-                      <div className="col-md-4 mb-4">
-                        <Card className="text-center">
-                          <Card.Header as="h5">
-                            <FontAwesomeIcon icon={faCoins} className="me-2" />
-                            Points Available
-                          </Card.Header>
-                          <Card.Body>
-                            <Card.Title className="display-4">{userPoints}</Card.Title>
-                            <Button variant="outline-primary" onClick={() => navigate('/select-package')}>
-                              <FontAwesomeIcon icon={faArrowCircleUp} className="me-2" />
-                              Top Up Points
                             </Button>
                           </Card.Body>
                         </Card>
@@ -157,7 +163,6 @@ function Home() {
         {isAdmin ? <AdminDashboard /> :
           <>
             {isStudent && <StudentDashboard />}
-            {isNextOfKin && <NextOfKinDashboard />}
           </>
         }
       </Container >

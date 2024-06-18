@@ -7,7 +7,7 @@ function AppContent() {
 
     return (
         <>
-            {/* {location.pathname !== "/sign-in" && <CustomNavbar />} */}
+            {location.pathname !== "/login" && <CustomNavbar />}
             {/* Additional content can go here */}
         </>
     );

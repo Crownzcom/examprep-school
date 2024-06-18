@@ -23,85 +23,25 @@ import db from '../../db';  // Import your Dexie database
  * @returns {Promise<object | string>} - The exam data or a message if not found
  */
 
-// export const getRandomExamBySubject = async (subjectName) => {
-//     try {
-//         // Query the 'exams' table for exams with the specified subject name
-//         const exams = await db.exams.where({ subjectName }).toArray();
-
-//         if (exams.length === 0) {
-//             // If no exams are found, return a message
-//             return 'Exam data does not exist yet for this subject';
-//         }
-
-//         // Randomly select one exam from the list
-//         const randomIndex = Math.floor(Math.random() * exams.length);
-//         const randomExam = exams[randomIndex];
-
-//         // Delete the exam from the database
-//         await db.exams.delete(randomExam.id);
-
-//         return randomExam;  // Return the deleted exam's data
-
-//     } catch (error) {
-//         console.error('Error retrieving or deleting exam:', error);
-//         throw new Error('Error retrieving or deleting exam data');  // Handle errors appropriately
-//     }
-// };
-
-export const getRandomExamBySubject = async (subjectName, userInfo) => {
+export const getSelectedExam = async (examID) => {
     try {
-        // Query the 'exams' table for exams with the specified subject name
-        const exams = await db.exams.where({ subjectName }).toArray();
+        // Query the 'exams' table for exams with the specified examID
+        const examInformation = await db.exams
+            .where("examID")
+            .equalsIgnoreCase(examID)
+            .first(); // Use first() to get the first matching record
 
-        if (exams.length === 0) {
-            // If no exams are found, send a message to the service worker to fetch new exams
-            try {
-                if ('serviceWorker' in navigator) {
-                    const registration = await navigator.serviceWorker.ready;
-                    registration.active.postMessage({
-                        type: 'FETCH_EXAMS',  // Custom event for the service worker
-                        subjects: [subjectName],  // Array of subjects to fetch
-                        userId: userInfo.userId,  // ID of the logged-in user
-                        educationLevel: userInfo.educationLevel,  // User's education level
-                    });
-                }
-            } catch (error) {
-                console.error('Error sending message to service worker:', error);
-            }
-
-            // Polling mechanism to check if the exam data has been added
-            const startTime = Date.now();
-            const timeout = 15000;  // 15 seconds timeout
-
-            while (Date.now() - startTime < timeout) {
-                const newExams = await db.exams.where({ subjectName }).toArray();
-                if (newExams.length > 0) {
-                    // If new exam data is found, return it
-                    const randomIndex = Math.floor(Math.random() * newExams.length);
-                    return newExams[randomIndex];
-                }
-                // Wait a bit before checking again
-                await new Promise((resolve) => setTimeout(resolve, 500));  // 500ms delay
-            }
-
-            // If no exam data is found after the timeout, return a message
-            return 'Exam data does not exist yet for this subject';
-        }
-
-        // Randomly select one exam from the list
-        const randomIndex = Math.floor(Math.random() * exams.length);
-        const randomExam = exams[randomIndex];
-
-        // Delete the retrieved exam from the database
-        await db.exams.delete(randomExam.id);
-
-        return randomExam;  // Return the randomly selected exam
+        // Return the selected exam data, or an empty array if no record is found
+        return examInformation ? examInformation : [];
 
     } catch (error) {
-        console.error('Error retrieving or deleting exam:', error);
-        throw new Error('Error retrieving or deleting exam data');  // Handle errors appropriately
+        console.error('Error retrieving exam:', error);
+        throw new Error('Error retrieving exam data');  // Handle errors appropriately
     }
 };
+
+//TODO: SET STUDENT AS HAS DONE EXAM AT THE END OF THE EXAM
+
 
 /**
  * Fetch Questions for a particular subject

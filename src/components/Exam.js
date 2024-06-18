@@ -15,7 +15,7 @@ import {
   QueryQ,
 } from "./renderQuiz/examsAppwriteConfig"; //Data from appwrite database
 import { useAuth } from "../context/AuthContext.js"
-import { getRandomExamBySubject } from "./renderQuiz/utils"
+import { getSelectedExam } from "./renderQuiz/utils"
 import { sst_ple, math_ple, eng_ple } from '../otherFiles/questionsData'; //Static data from local files
 
 /**
@@ -24,10 +24,11 @@ import { sst_ple, math_ple, eng_ple } from '../otherFiles/questionsData'; //Stat
  * @param {string} props.subject - The subject of the exam.
  * @returns {JSX.Element} The Exam component.
  */
-function Exam({ subject }) {
+function Exam({ examID }) {
   const [showInstructionsModal, setShowInstructionsModal] = useState(true);
   const [showUnavailableModal, setshowUnavailableModal] = useState(true);
   const [data, setData] = useState(null); // Variable to store the fetched questions data
+  const [subject, setSubject] = useState('')
 
   const { userInfo } = useAuth();
 
@@ -37,66 +38,18 @@ function Exam({ subject }) {
     // Fetch data from your cloud Appwrite database
     const fetchData = async () => {
       try {
-        let collection_id;
-        let subjectName = null;
-        switch (subject) {
-          case "social-studies_ple":
-            collection_id = sstTablePLE_id;
-            subjectName = "sst-ple"
-            break;
-          case "mathematics_ple":
-            collection_id = mathPLE_id;
-            subjectName = "mtc-ple"
-            break;
-          case "english-language_ple":
-            collection_id = engTbalePLE_id;
-            subjectName = "eng-ple"
-            break;
-          case "science_ple":
-            collection_id = sciTablePLE_id;
-            subjectName = "sci-ple"
-            break;
-          default:
-            collection_id = null;
-            return;
+        let questionData = []
+        questionData = await getSelectedExam(examID);
+        console.log('Retrieved Exam Information: ', questionData);
+        console.log('Retrieved qtns from dexieDB: ', questionData.examData);
+
+        if (JSON.stringify(questionData.length < 0)) {
+          navigate(-1);
         }
 
-        let questionData = [];
 
-        // if (subjectName === "eng-ple") {
-        //quetions picked from appwrite database directly
-        const response = await databasesQ.listDocuments(
-          database_idQ,
-          collection_id,
-          [QueryQ.limit(80), QueryQ.orderAsc("$id")]
-        );
-
-        const questions = response.documents;
-        questionData = questions;
-
-        // console.log('Questions: ', questionData);
-
-        // Convert questions from JSON strings to JSON objects
-        questionData.forEach((obj) => {
-          obj.questions = obj.questions.map((q) => JSON.parse(q));
-          // delete obj.$id
-          delete obj.$createdAt
-          delete obj.$updatedAt
-          delete obj.$permissions
-          delete obj.$databaseId
-          delete obj.$collectionId
-        });
-
-        // console.log('Retrieved Exams: ', questionData);
-        setData(questionData); // Assign the fetched data to the variable
-
-        // }
-        // else {
-        //   // For questions saved in index db
-        //   questionData = await getRandomExamBySubject(subjectName, { userId: userInfo.userId, educationLevel: userInfo.educationLevel });
-        //   console.log('Retrieved qtns from dexieDB: ', questionData.examData);
-        //   setData(questionData.examData); // Assign the fetched data to the variable
-        // }
+        setSubject(questionData.subJectName)
+        setData(JSON.parse(questionData.examData)); // Assign the fetched data to the variable
 
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -117,7 +70,7 @@ function Exam({ subject }) {
     }
     else {
       setShowInstructionsModal(false);
-      setshowUnavailableModal(false); // Set the subject validity to false
+      // setshowUnavailableModal(false); // Set the subject validity to false
     }
   };
 
@@ -126,37 +79,7 @@ function Exam({ subject }) {
   };
 
   const renderQuizContent = () => {
-    switch (subject) {
-      case "english-language_ple":
-        // return <IframeComponent url="https://exams.crownz.derrickml.com/english_ple_section_B" />;
-        // return <IframeComponent url="https://www.exampreptutor.com/english_ple_section_B/" />;
-        // return <IframeComponent url="http://http://192.168.100.12:5173/" />;
-        // return <IframeComponent url="http://localhost:5173/" />;
-
-        // return <IframeComponent url="https://exampreptutor.com/english_ple_section_B/" />;
-
-        if (data === null) { return null }
-        else {
-          return <QuizContainer questionsData={eng_ple} subjectName={'eng_ple'} />;
-        };
-
-      case "social-studies_ple":
-        if (data === null) { return null }
-        else {
-          return <QuizContainer questionsData={data} subjectName={'sst_ple'} />;
-        };
-
-      case "mathematics_ple":
-        // return <QuizContainer questionsData={math_ple} subjectName={'math_ple'} />;
-        return <QuizContainer questionsData={data} subjectName={'math_ple'} />;
-
-      case "science_ple":
-        return <QuizContainer questionsData={data} subjectName={'sci_ple'} />;
-
-      default:
-        return null;
-
-    }
+    return <QuizContainer questionsData={data} subjectName={'subject'} />;
   };
 
   const subjectInstructions = () => {

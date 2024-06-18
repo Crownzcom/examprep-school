@@ -6,6 +6,7 @@ import {
   studentMarksTable_id,
   pointsTable_id,
   subjectsTable_id,
+  examsTable_id,
   Query,
 } from "../appwriteConfig.js";
 import { serverUrl } from "../config.js"
@@ -22,7 +23,7 @@ export const fetchStudents = async (refresh = false) => {
 
     if (refresh) {
       // console.log('Fetching students data from database due to refresh flag.');
-      const response = await fetch(`${serverUrl}/db/fetch-students`);
+      const response = await fetch(`http://localhost:3001/students/fetch-students`);
       const data = await response.json();
       if (response.ok) {
         await updateStudentsLocalDatabase(data.data);
@@ -31,43 +32,21 @@ export const fetchStudents = async (refresh = false) => {
         throw new Error(data.message || 'Error fetching students data from the database');
       }
     } else {
-      // console.log('Fetching students data from local file.');
-      const response = await fetch(`${serverUrl}/query/students`);
+      console.log('Fetching students data from local file.');
+      const response = await fetch(`${serverUrl}/students/fetch-students`);
       const data = await response.json();
       if (response.ok) {
-        // console.log('Students Data fetched successfully: ', data);
+        console.log('Students Data fetched successfully: ', data);
         await updateStudentsLocalDatabase(data);
-        // console.log('Students Data fetched from file and saved to local database.');
+        console.log('Students Data fetched from file and saved to local database.');
         return data;
       } else {
-        console.warn('Failed to fetch students datas from local file, trying the database refresh.');
+        console.warn('Failed to fetch students data from local file, trying the database refresh.');
         return fetchStudents(true); // Recursive call with refresh true
       }
     }
   } catch (error) {
     console.error('Error fetching students data:', error);
-    throw error;
-  }
-};
-
-//Fetch transactions
-export const fetchTransactions = async () => {
-  try {
-    // console.log('Initiating transaction fetch process, refresh:');
-
-    const response = await fetch(`${serverUrl}/flutterwave/transactions`);
-
-    const data = await response.json();
-    if (response.ok) {
-      // console.log('Transaction Data fetched successfully: ', data);
-      await updateTransactionsLocalDatabase(data.data);
-      // console.log('Transaction Data fetched from database and updated locally.');
-      return data.data;
-    } else {
-      throw new Error(data.message || 'Error  transaction data from the database');
-    }
-  } catch (error) {
-    console.error('Error fetching transaction data:', error);
     throw error;
   }
 };
@@ -79,7 +58,7 @@ async function updateStudentsLocalDatabase(studentData) {
       // Clear the existing entries in the students table
       await db.students.clear();
 
-      // console.log('Saving to IndexDB ... ');
+      console.log('Saving to IndexDB ... ');
       // Bulk put the new data after clearing the table
       const savingToIndexDB = await db.students.bulkPut(studentData.map(student => ({
         ...student,
@@ -88,17 +67,17 @@ async function updateStudentsLocalDatabase(studentData) {
         lastName: student.lastName.toLowerCase(),
         otherName: student.otherName ? student.otherName.toLowerCase() : '',
         studName: toTitleCase(student.studName),
-        schoolName: toTitleCase(student.schoolName),
-        schoolAddress: toTitleCase(student.schoolAddress),
+        class: toTitleCase(student.class),
+        stream: toTitleCase(student.stream),
         // label: JSON.stringify(student.label),
-        label: student.label,
+        label: student.label || null,
         Results: JSON.stringify(student.Results.map(result => ({
           subject: result.subject,
           score: result.score,
           resultDetails: result.resultDetails,
           dateTime: result.dateTime
         }))),
-        accountCreatedDate: new Date(student.accountCreatedDate).toLocaleString("en-US", {
+        accountCreationDate: new Date(student.accountCreationDate).toLocaleString("en-US", {
           timeZone: "Africa/Nairobi",
           hour12: false,
           year: "numeric",
@@ -108,7 +87,7 @@ async function updateStudentsLocalDatabase(studentData) {
           minute: "2-digit",
           second: "2-digit",
         }),
-        accountStatus: student.accountStatus
+        userType: student.userType
       })));
 
       // console.log('IndexDB response: ', savingToIndexDB);
@@ -118,18 +97,58 @@ async function updateStudentsLocalDatabase(studentData) {
   }
 }
 
-//Update transactions data in Index DB in local database
-async function updateTransactionsLocalDatabase(transactionData) {
+//Fetch exams from database and pass to index db
+export const fetchSetExams = async (studClass, stream) => {
   try {
-    await db.transaction('rw', db.transactions, async () => {
-      // Clear the existing entries in the students table
-      await db.transactions.clear();
+    const response = await databases.listDocuments(database_id, examsTable_id, [
+      Query.and([
+        Query.equal('classID', studClass),
+        Query.contains('stream', stream)
+      ])
+    ]);
 
-      // console.log('Saving to IndexDB ... ');
+    if (response.documents.length > 0) {
+      console.log('Exams Fetched: ', response.documents)
+      await updateExamData(response.documents)
+      return true;
+    }
+    else {
+      return false;
+    }
+
+  } catch (e) {
+    console.error('Failed to fetch exams from database: ', e);
+  }
+}
+
+//Update students data in Index DB in local database
+async function updateExamData(examData) {
+  try {
+    await db.transaction('rw', db.exams, async () => {
+      // Clear the existing entries in the exams table
+      await db.exams.clear();
+
+      console.log('Saving to IndexDB ... ');
       // Bulk put the new data after clearing the table
-      const savingToIndexDB = await db.transactions.bulkPut(transactionData.map(transaction => ({
-        ...transaction,
-        createdAt: new Date(transaction.createdAt).toLocaleString("en-US", {
+      const savingToIndexDB = await db.exams.bulkPut(examData.map(exam => ({
+        ...exam,
+        examID: exam.examID,
+        subjectName: exam.subjectName,
+        className: exam.classID,
+        stream: JSON.stringify(exam.stream),
+        durationMINS: exam.durationMINS.toString(),
+        examData: exam.examQuestions,
+        openingDate: new Date(exam.openingDate).toLocaleString("en-US", {
+          timeZone: "Africa/Nairobi",
+          hour12: false,
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+        }),
+        closingDate: new Date(exam.closingDate).toLocaleString("en-US", {
           timeZone: "Africa/Nairobi",
           hour12: false,
           year: "numeric",
@@ -141,10 +160,10 @@ async function updateTransactionsLocalDatabase(transactionData) {
         })
       })));
 
-      // console.log('IndexDB response: ', savingToIndexDB);
+      console.log('IndexDB response: ', savingToIndexDB);
     });
   } catch (error) {
-    console.error('Error updating, error:', error);
+    console.error('Error updating exams:', error);
   }
 }
 
@@ -155,52 +174,31 @@ function toTitleCase(text) {
 
 /**
  * Fetches and processes student and their results data.
- * @param {string} kinID - The ID of the next-of-kin.
+ * @param {string} null - The ID of the next-of-kin.
  */
-export const fetchAndProcessStudentData = async (kinID) => {
+export const fetchAndProcessStudentData = async () => {
   try {
-    // console.log('Fetching and processing student data ...')
-    // Step 1: Fetch students linked to the next-of-kin
-    const students = await fetchStudentsLinkedToKin(kinID);
-
-    // Step 2: Fetch results and points for each student and process data
-    const processedData = await Promise.all(
-      students.map(async (student) => {
-        // Fetch results
-        const results = await fetchStudentResults(student.studID);
-
-        // Fetch points
-        const points = await fetchStudentPoints(student.studID);
-        const pointsBalance = points.length > 0 ? points[0].PointsBalance : 0; // Assuming each student has only one points document
-
-        // Construct processed student data object
-        return {
-          studID: student.studID,
-          studName: `${student.firstName} ${student.lastName} ${student.otherName || ""}`,
-          gender: student.gender,
-          phone: student.phone,
-          email: student.email,
-          educationLevel: student.educationLevel,
-          schoolName: student.schoolName,
-          schoolAddress: student.schoolAddress,
-          pointsBalance: pointsBalance,
-          Results: results.map((result) => ({
-            subject: result.subject,
-            score: result.marks,
-            totalPossibleMarks: result.totalPossibleMarks,
-            resultDetails: result.results,
-            dateTime: formatDate(result.$createdAt),
-          })),
-        };
-
+    await fetch('http://localhost:3001/students/fetch-students')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
       })
-    );
+      .then(data => {
+        console.log(data); // This logs the data retrieved from the server
 
+        console.log('Processed Data: ', data.data)
 
-    // Step 3: Save the processed data to local storage using storageUtil
-    storageUtil.setItem("studentData", processedData);
+        // Step 3: Save the processed data to local storage using storageUtil
+        storageUtil.setItem("studentData", data.data);
+      })
+      .catch(error => {
+        console.error('Error fetching data:', error);
+      });
   } catch (error) {
     console.error("Error fetching and processing student data:", error);
+    throw new Error("Error fetching and processing student data:", error)
   }
 };
 
@@ -209,11 +207,9 @@ export const fetchAndProcessStudentData = async (kinID) => {
  * @param {string} kinID - The ID of the next-of-kin.
  * @returns {Promise<Array>} - A promise that resolves to an array of students.
  */
-const fetchStudentsLinkedToKin = async (kinID) => {
+const fetchStudentsLinkedToKin = async (query = []) => {
   try {
-    const response = await databases.listDocuments(database_id, studentTable_id, [
-      Query.equal("kinID", [kinID]),
-    ]);
+    const response = await databases.listDocuments(database_id, studentTable_id, query);
     return response.documents;
   } catch (err) {
     console.error('Failed to fecth students LINKED to next-of-kin. ' + err);
@@ -236,25 +232,6 @@ const fetchStudentResults = async (studID) => {
   } catch (err) {
     console.error('Failed to fecth Students RESULTS linked to next-of-kin. ' + err);
   }
-};
-
-/**
- * Fetches student points for a specific student.
- * @param {string} studID - The ID of the student.
- * @returns {Promise<Array>} - A promise that resolves to an array of results.
- */
-const fetchStudentPoints = async (studID) => {
-  try {
-    const response = await databases.listDocuments(
-      database_id,
-      pointsTable_id,
-      [Query.equal("UserID", [studID])]
-    );
-    return response.documents;
-  } catch (err) {
-    console.error('Failed to fecth Students POINTS linked to next-of-kin. ' + err);
-  }
-
 };
 
 /**
@@ -333,36 +310,6 @@ export const studentSubjectsData = async (enrolledSubjectsData, educationLevel) 
 }
 
 /**
-    * Handles student enrollment.
-    * @param {string} userDocId - Document id string.
-    * @param {string} subject - Subject string passed.
-    * @returns {string || null} - return sting or nothing.
-    */
-// export const studentEnrollSubject = async (userDocId, subject) => {
-//   console.log("Student Enroll Subject: ", subject);
-//   console.log("Student DocuID: ", userDocId)
-//   if (!subject) {
-//     console.log('Subject is required');
-//     return
-//   }
-
-//   databases.getDocument(database_id, studentTable_id, userDocId)
-//     .then(document => {
-//       const updatedArray = [...document.subjects, subject];
-
-//       return databases.updateDocument(database_id, studentTable_id, userDocId, {
-//         subjects: updatedArray
-//       });
-//     })
-//     .then(updatedDocument => {
-//       console.log('Item appended successfully: ', updatedDocument);
-//     })
-//     .catch(error => {
-//       console.error('Error:', error);
-//     });
-// };
-
-/**
  * Formats the date string into a more readable format.
  * @param {string} dateTime - The original date-time string.
  * @returns {string} - The formatted date-time string.
@@ -381,19 +328,22 @@ const formatDate = (dateTime) => {
 /**
  * Retrive data from index database
  */
-export const initiateIndexDB = async (labels) => {
+export const initiateIndexDB = async (userInfo) => {
   //Fetch all students data
   // console.log("Checking whether user is an admin or staff");
-  if (labels.includes("admin") || labels.includes("staff")) {
+  if (userInfo.userType === "admin" || userInfo.userType === "staff") {
     // console.log('Fetching student data');
     await fetchStudents(true).then(data => {
-      // console.log('Students data Fetch successfully');
+      console.log('Students data Fetch successfully');
     }).catch(error => {
       console.error('Failed to fetch students');
     });
-
-    await fetchTransactions().then(data => { }).catch(error => {
-      console.error('Failed to fetch transactions');
+  }
+  else if (userInfo.userType === 'student') {
+    await fetchSetExams(userInfo.studClass, userInfo.stream).then(data => {
+      console.log('Student exam Fetch successfully');
+    }).catch(error => {
+      console.error('Failed to fetch student exams');
     });
   }
 }

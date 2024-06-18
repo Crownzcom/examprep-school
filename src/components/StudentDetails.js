@@ -29,7 +29,6 @@ import {
   faPen,
   faCircleArrowUp
 } from "@fortawesome/free-solid-svg-icons";
-import { kinPurchasePoints } from '../utilities/otherUtils'
 
 const StudentDetails = () => {
   const navigate = useNavigate();
@@ -86,51 +85,21 @@ const StudentDetails = () => {
                       <strong>Gender:</strong> {displayValue(student.gender)}
                     </ListGroup.Item>
                     <ListGroup.Item>
-                      <FontAwesomeIcon icon={faPhone} className="me-2" />
-                      <strong>Phone:</strong> {displayValue(student.phone)}
+                      <FontAwesomeIcon icon={faEnvelope} className="me-2" />
+                      <strong>ID No.:</strong> {displayValue(student.userID)}
                     </ListGroup.Item>
                     <ListGroup.Item>
-                      <FontAwesomeIcon icon={faEnvelope} className="me-2" />
-                      <strong>Email:</strong> {displayValue(student.email)}
+                      <FontAwesomeIcon icon={faPhone} className="me-2" />
+                      <strong>Class:</strong> {displayValue(student.studClass)}
                     </ListGroup.Item>
                     <ListGroup.Item>
                       <FontAwesomeIcon
                         icon={faGraduationCap}
                         className="me-2"
                       />
-                      <strong>Education Level:</strong>{" "}
-                      {displayValue(student.educationLevel)}
+                      <strong>Stream:</strong>{" "}
+                      {displayValue(student.stream)}
                     </ListGroup.Item>
-                    <ListGroup.Item>
-                      <FontAwesomeIcon icon={faSchool} className="me-2" />
-                      <strong>School Name:</strong>{" "}
-                      {displayValue(student.schoolName)}
-                    </ListGroup.Item>
-                    <ListGroup.Item>
-                      <FontAwesomeIcon icon={faMapMarkerAlt} className="me-2" />
-                      <strong>School Address:</strong>{" "}
-                      {displayValue(student.schoolAddress)}
-                    </ListGroup.Item>
-                    {/* <ListGroup.Item>
-                      <div style={{ fontSize: '0.9em', paddingBottom: '3px' }} >
-                        <FontAwesomeIcon icon={faCoins} className="me-2" />
-                        <strong>Points Left:</strong>{" "}
-                        <Badge bg={student.pointsBalance < 20 ? 'danger' : 'success'} style={{ fontSize: '0.9em' }}>
-                          {student.pointsBalance}
-                        </Badge>
-                      </div>
-
-                      <Button
-                        variant={`outline-${student.pointsBalance < 20 ? 'danger' : 'success'}`}
-                        onClick={() => {
-                          kinPurchasePoints(navigate, { userId: student.studID, name: student.studName, educationLevel: student.educationLevel })
-                        }}
-                      >
-                        <FontAwesomeIcon icon={faCircleArrowUp} />
-                        Top Up Points
-                      </Button>
-
-                    </ListGroup.Item> */}
                   </ListGroup>
                 </Card.Body>
               </Card>

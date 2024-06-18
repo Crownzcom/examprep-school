@@ -4,7 +4,6 @@ import { useDispatch } from 'react-redux';
 import { resetAnswers } from './redux/actions';
 import { Container, Row, Col, Modal, ButtonGroup, Button, Spinner, Card } from 'react-bootstrap';
 import { useAuth } from '../../context/AuthContext';
-import { generateRandomExam } from './utils'; // Import your function
 import SaveButton from './SaveButton';
 import QuestionCard from './QuestionCard';
 import Timer from './Timer';
@@ -29,21 +28,12 @@ const QuizContainer = ({ questionsData, subjectName }) => {
             setIsLoading(true);
 
             try {
-                const randomQuestions = await generateRandomExam(questionsData, subjectName, userInfo.userId, userInfo.educationLevel);
 
-                if (randomQuestions) {
-                    setSelectedQuestions(randomQuestions);
-                    // console.log("Selected questions: ", randomQuestions);
+                if (questionsData) {
+                    setSelectedQuestions(questionsData);
                 } else {
                     console.error('Failed to fetch random questions');
                 }
-
-                // if (questionsData) {
-                //     console.log('QuizContainer: passing questions data', questionsData);
-                //     setSelectedQuestions(questionsData);
-                // } else {
-                //     console.error('Failed to populate questions');
-                // }
 
             } catch (error) {
                 console.error('Error fetching questions:', error);

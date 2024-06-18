@@ -1,114 +1,83 @@
-// src/components/Testing.js
-import React, { useState } from 'react';
-import {
-  Form,
-  Button,
-  Container,
-  Row,
-  Col,
-  Alert,
-  Card,
-  Nav,
-  Tab,
-} from "react-bootstrap";
-import { account } from '../appwriteConfig';
+import React, { useState, useEffect } from 'react';
+import { Container, Button } from 'react-bootstrap';
+import SchoolForm from './initiate/SchoolForm';
+import ApiForm from './initiate/ApiForm';
+// import StatusUpdates from './initiate/StatusUpdates';
 
-function Testing() {
-  const [email, setEmail] = useState("");
+const Testing = () => {
+  const [step, setStep] = useState(1);
+  const [schoolData, setSchoolData] = useState({});
+  const [eventSource, setEventSource] = useState(null);
 
-  // Appwrite Email Verification API
-  const verifyEmail = async () => {
-    try {
-      const response = await account.createVerification(
-        'https://exampreptutor.com' // url
-      );
-
-      console.log(response);
-    } catch (err) {
-      console.log('Failed to verify: ', err.message);
-      console.error('Failed to verify: ', err);
-    }
+  const handleNext = (data) => {
+    setSchoolData(data);
+    setStep(2);
   };
 
-  // Appwrite Password Reset API
-  const resetPassword = async () => {
-    try {
-      const response = await account.createRecovery(
-        email,
-        'https://exampreptutor.com' // url
-      );
-
-      console.log(response);
-    } catch (err) {
-      console.log('Failed to verify: ', err.message);
-      console.error('Failed to verify: ', err);
-    }
+  const handleBack = () => {
+    setStep(1);
   };
+
+  const handleSubmit = (apiData) => {
+    let finalData = { ...schoolData, ...apiData };
+    // Send data to server
+    console.log(finalData);
+    console.log('first class element: ', finalData.classes[0].class)
+
+    fetch('http://localhost:3001/initiate/submit', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(finalData)
+    })
+      .then(response => {
+        if (response.ok) {
+          setStep(3); // Move to status update step
+          const es = new EventSource('http://localhost:3001/initiate/status-updates');
+          setEventSource(es);
+          finalData = null;
+        } else {
+          return response.json().then(data => {
+            throw new Error(data.message);
+          });
+        }
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+        finalData = null;
+      });
+  };
+
+  const handleEventSourceClose = () => {
+    if (eventSource) {
+      eventSource.close();
+    }
+    console.log('EventSource closed');
+  };
+
+  useEffect(() => {
+    return () => {
+      if (eventSource) {
+        eventSource.close();
+      }
+    };
+  }, [eventSource]);
 
   return (
     <Container>
-      <Tab.Container id="left-tabs-example" defaultActiveKey="verifyEmail">
-        <Row>
-          <Col sm={3}>
-            <Nav variant="pills" className="flex-column">
-              <Nav.Item>
-                <Nav.Link eventKey="verifyEmail">Verify Email</Nav.Link>
-              </Nav.Item>
-              <Nav.Item>
-                <Nav.Link eventKey="resetPassword">Reset Password</Nav.Link>
-              </Nav.Item>
-            </Nav>
-          </Col>
-          <Col sm={9}>
-            <Tab.Content>
-              <Tab.Pane eventKey="verifyEmail">
-                <Card>
-                  <Card.Body>
-                    <Card.Title>Email Verification</Card.Title>
-                    <Form>
-                      <Form.Group controlId="formEmail">
-                        <Form.Label>Email address</Form.Label>
-                        <Form.Control
-                          type="email"
-                          placeholder="Enter email"
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                        />
-                      </Form.Group>
-                      <Button variant="primary" onClick={verifyEmail}>
-                        Verify Email
-                      </Button>
-                    </Form>
-                  </Card.Body>
-                </Card>
-              </Tab.Pane>
-              <Tab.Pane eventKey="resetPassword">
-                <Card>
-                  <Card.Body>
-                    <Card.Title>Reset Password</Card.Title>
-                    <Form>
-                      <Form.Group controlId="formEmail">
-                        <Form.Label>Email address</Form.Label>
-                        <Form.Control
-                          type="email"
-                          placeholder="Enter email"
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                        />
-                      </Form.Group>
-                      <Button variant="primary" onClick={resetPassword}>
-                        Reset Password
-                      </Button>
-                    </Form>
-                  </Card.Body>
-                </Card>
-              </Tab.Pane>
-            </Tab.Content>
-          </Col>
-        </Row>
-      </Tab.Container>
+      <div hidden={step !== 1}>
+        <SchoolForm onNext={handleNext} initialData={schoolData} />
+      </div>
+      <div hidden={step !== 2}>
+        <ApiForm onBack={handleBack} onSubmit={handleSubmit} />
+      </div>
+      <div hidden={step !== 3}>
+        {/* <StatusUpdates eventSource={eventSource} onClose={handleEventSourceClose} /> */}
+        <Button variant="secondary" onClick={() => setStep(1)}>Back to Forms</Button>
+      </div>
     </Container>
   );
-}
+};
 
 export default Testing;

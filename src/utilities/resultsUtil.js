@@ -18,6 +18,7 @@ export async function fetchAndUpdateResults(userId) {
     // Update local storage with new results
     storageUtil.setItem("examResults", "");
     storageUtil.setItem("examResults", response.documents);
+    console.log("Updated results: ", response.documents);
     return response.documents;
   } catch (error) {
     console.error("Failed to retrieve student results:", error);
@@ -44,6 +45,7 @@ export const getTransformedResults = (studentId) => {
   const resultsMap = new Map();
 
   userResults.forEach((doc) => {
+    // studID,	studInfo, subject, marks, dateTime, results, totalPossibleMarks
     const subject = doc.subject;
     const dateTime = formatDate(doc.$createdAt);
     const score = doc.marks;

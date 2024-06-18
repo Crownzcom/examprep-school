@@ -20,25 +20,20 @@ import { saveAs } from 'file-saver'; // You may need to install with `npm instal
 
 async function downloadCSV(students, fileName = "students_data.csv") {
     const headers = [
-        "studID", "studName", "firstName", "lastName", "otherName", "gender", "phone", "email", "educationLevel", "schoolName", "schoolAddress", "pointsBalance", "NumberOfExams", "accountCreationDate", "accountStatus", "userType"
+        "userId", "firstName", "lastName", "otherName", "gender", "phone", "email", "studClass", "stream",
     ];
     const rows = students.map(student => [
-        `"${student.studID}"`,
-        `"${student.studName}"`,
+        `"${student.userId}"`,
         `"${student.firstName}"`,
         `"${student.lastName}"`,
         `"${student.otherName || ''}"`, // Handle null or undefined values
         `"${student.gender}"`,
         `"${student.phone || ''}"`, // Handle null or undefined values
         `"${student.email}"`,
-        `"${student.educationLevel}"`,
-        `"${student.schoolName}"`,
-        `"${student.schoolAddress}"`,
-        `"${student.pointsBalance}"`,
-        `${student.Results ? student.Results.length : 0}`, // No need for quotes, it's a number
-        `"${student.accountCreatedDate}"`,
-        `"${student.accountStatus}"`,
+        `"${student.studClass}"`,
+        `"${student.stream}"`,
         `"${student.userType}"`,
+        `${student.Results ? student.Results.length : 0}`, // No need for quotes, it's a number
     ]);
 
     // Convert array of arrays into CSV string
@@ -65,7 +60,7 @@ const StudentContainer = () => {
 
     useEffect(() => {
         async function InitialloadStudents() {
-            if (userInfo.labels.includes("admin") || userInfo.labels.includes("staff")) {
+            if (userInfo.userType === 'admin') {
                 try {
                     // await fetchStudents();
                 } catch (error) {
@@ -86,9 +81,6 @@ const StudentContainer = () => {
                         const student = await getStudentById(filterValue);
                         loadedStudents = student ? [student] : [];
                         break;
-                    case 'educationLevel':
-                        loadedStudents = await getStudentsByEducationLevel(filterValue);
-                        break;
                     case 'firstName':
                         loadedStudents = await getStudentsByFirstName(filterValue);
                         break;
@@ -98,13 +90,13 @@ const StudentContainer = () => {
                     case 'otherName':
                         loadedStudents = await getStudentsByOtherName(filterValue);
                         break;
-                    case 'schoolName':
+                    case 'studClass':
                         loadedStudents = await getStudentsBySchoolName(filterValue);
                         break;
                     case 'gender':
                         loadedStudents = await getStudentsByGender(filterValue);
                         break;
-                    case 'userType':
+                    case 'stream':
                         loadedStudents = await getStudentsByUserType(filterValue);
                         break;
                     case 'all':
@@ -131,7 +123,7 @@ const StudentContainer = () => {
     const refreshStudentsData = async () => {
         try {
             setRefreshResults(true);
-            if (userInfo.labels.includes("admin") || userInfo.labels.includes("staff") || userInfo.labels.includes("sales")) {
+            if (userInfo.userType === 'admin') {
                 await fetchStudents(true);
             }
         } catch (e) {
@@ -151,9 +143,6 @@ const StudentContainer = () => {
                         const student = await getStudentById(filterValue);
                         if (student) studentsToDownload = [student];
                         break;
-                    case 'educationLevel':
-                        studentsToDownload = await getStudentsByEducationLevel(filterValue);
-                        break;
                     case 'firstName':
                         studentsToDownload = await getStudentsByFirstName(filterValue);
                         break;
@@ -163,16 +152,18 @@ const StudentContainer = () => {
                     case 'otherName':
                         studentsToDownload = await getStudentsByOtherName(filterValue);
                         break;
+                    case 'studClass':
+                        studentsToDownload = await getStudentsBySchoolName(filterValue);
+                        break;
                     case 'gender':
                         studentsToDownload = await getStudentsByGender(filterValue);
                         break;
-                    case 'schoolName':
-                        studentsToDownload = await getStudentsBySchoolName(filterValue);
-                        break;
-                    case 'userType':
-                        studentsToDownload = await getStudentsByUserType(filterValue);
-                        break;
+                    // case 'stream':
+                    //     studentsToDownload = await getStudentsByUserType(filterValue);
+                    //     break;
+                    case 'all':
                     default:
+                        studentsToDownload = await getAllStudents();
                         break;
                 }
             } else {
@@ -210,9 +201,9 @@ const StudentContainer = () => {
                             <option value="firstName">By First Name</option>
                             <option value="lastName">By Last Name</option>
                             <option value="otherName">By Other Name</option>
-                            <option value="schoolName">By School Name</option>
+                            <option value="studClass">By Student Class</option>
                             <option value="gender">By Gender</option>
-                            <option value="userType">By User Type</option>
+                            {/* <option value="stream">By Stream</option> */}
                         </Form.Select>
                         {(filter !== 'all' && filter !== 'gender' && filter !== 'userType') && (
                             <Form.Control
@@ -230,10 +221,10 @@ const StudentContainer = () => {
                                 aria-label="Gender selection"
                                 className="mb-3"
                             >
-                                <option value="">Select education Level</option>
-                                <option value="PLE">PLE</option>
-                                <option value="UCE">UCE</option>
-                                <option value="UACE">UACE</option>
+                                <option value="">Select Class</option>
+                                <option value="P1">Primary 1</option>
+                                <option value="P2">Primary 2</option>
+                                <option value="P3">Primary 3</option>
                             </Form.Select>
                         )}
                         {filter === 'gender' && (
@@ -247,22 +238,6 @@ const StudentContainer = () => {
                                 <option value="male">Male</option>
                                 <option value="female">Female</option>
                                 <option value="other">Other</option>
-                            </Form.Select>
-                        )}
-                        {filter === 'userType' && (
-                            <Form.Select
-                                value={filterValue}
-                                onChange={e => setFilterValue(e.target.value)}
-                                aria-label="User Type selection"
-                                className="mb-3"
-                            >
-                                <option value="">Select User Type</option>
-                                <option value="student">Student</option>
-                                <option value="staff">Staff</option>
-                                <option value="admin">Admin</option>
-                                <option value="sales">Sales</option>
-                                <option value="tester">Tester</option>
-                                <option value="subscriber">Subscriber</option>
                             </Form.Select>
                         )}
                     </Col>

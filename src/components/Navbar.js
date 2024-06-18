@@ -57,7 +57,7 @@ const CustomNavbar = () => {
                   setExpanded(false);
                 }}
                 as={NavLink}
-                to="/sign-in"
+                to="/login"
               >
                 Logout
               </Nav.Link>
@@ -80,7 +80,7 @@ const CustomNavbar = () => {
             <>
               <Nav.Link
                 as={NavLink}
-                to="/sign-in"
+                to="/login"
                 onClick={() => setExpanded(false)}
               >
                 Login

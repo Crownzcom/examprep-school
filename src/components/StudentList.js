@@ -31,9 +31,11 @@ const StudentList = ({ StudentList, itemsPerPage, currentPage, paginate, loader 
             <Table hover>
               <thead>
                 <tr>
-                  <th>No.</th>
+                  {/* <th>ID No.</th> */}
+                  <th>ID No.</th>
                   <th>Name</th>
-                  <th>Education Level</th>
+                  <th>Class</th>
+                  <th>Stream</th>
                   <th>Exams Finished</th>
                   <th>Actions</th>
                 </tr>
@@ -41,10 +43,12 @@ const StudentList = ({ StudentList, itemsPerPage, currentPage, paginate, loader 
 
               <tbody>
                 {paginatedStudents.map((student, index) => (
-                  <tr key={student.studID}>
-                    <td>{startIndex + index + 1}</td>
+                  <tr key={index++}>
+                    {/* <td>{startIndex + index + 1}</td> */}
+                    <td>{student.userID}</td>
                     <td>{student.studName}</td>
-                    <td>{student.educationLevel}</td>
+                    <td>{student.studClass}</td>
+                    <td>{student.stream}</td>
                     <td>{student.Results.length}</td>
                     <td>
                       <Button
