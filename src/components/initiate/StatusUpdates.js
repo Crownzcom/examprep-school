@@ -4,6 +4,7 @@ import { ListGroup, Spinner, Fade, Alert, Button } from 'react-bootstrap';
 const StatusUpdates = ({ eventSource, onClose, onNextStep }) => {
     const [updates, setUpdates] = useState([]);
     const [finalTables, setFinalTables] = useState(null);
+    const [subjects, setSubjects] = useState(null);
     const [databaseID, setDatabaseID] = useState(null);
 
     useEffect(() => {
@@ -16,6 +17,7 @@ const StatusUpdates = ({ eventSource, onClose, onNextStep }) => {
                 if (newUpdate.tables) {
                     setFinalTables(newUpdate.tables);
                     setDatabaseID(newUpdate.databaseID);
+                    setSubjects(newUpdate.subjectExamTables);
                 }
             };
 
@@ -52,7 +54,7 @@ const StatusUpdates = ({ eventSource, onClose, onNextStep }) => {
             </ListGroup>
             {finalTables && (
                 <div className="mt-3">
-                    <Button variant="primary" onClick={() => onNextStep(finalTables, databaseID)}>
+                    <Button variant="primary" onClick={() => onNextStep(finalTables, databaseID, subjects)}>
                         Proceed to Next Step
                     </Button>
                 </div>
