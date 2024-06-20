@@ -38,18 +38,21 @@ function Exam({ examID }) {
     // Fetch data from your cloud Appwrite database
     const fetchData = async () => {
       try {
+
+        const test = await databasesQ.listDocuments(database_idQ, engTbalePLE_id)
+        console.log(test)
         let questionData = []
         questionData = await getSelectedExam(examID);
-        console.log('Retrieved Exam Information: ', questionData);
-        console.log('Retrieved qtns from dexieDB: ', questionData.examData);
+        console.log('Retrieved Exam Information: ', questionData[0].examQuestions);
 
-        if (JSON.stringify(questionData.length < 0)) {
-          navigate(-1);
-        }
+        // if (JSON.stringify(questionData[0].examQuestions.length < 0)) {
+        //   // navigate(-1);
+        //   console.log('no exam found');
+        // }
 
 
-        setSubject(questionData.subJectName)
-        setData(JSON.parse(questionData.examData)); // Assign the fetched data to the variable
+        setSubject(questionData[0].subJectName)
+        setData(JSON.parse(questionData[0].examQuestions)); // Assign the fetched data to the variable
 
       } catch (error) {
         console.error("Error fetching data:", error);

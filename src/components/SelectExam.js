@@ -93,7 +93,7 @@ function SelectExam() {
   const refreshExams = async () => {
     try {
       setRefreshExams(true);
-      await fetchSetExams(userInfo.studClass, userInfo.stream);
+      await fetchSetExams(userInfo);
       const examsData = await db.exams.toArray();
       setExams(examsData);
     } catch (e) {

@@ -8,6 +8,7 @@ import { fetchAndUpdateResults } from "../../utilities/resultsUtil";
 import { fetchAndProcessStudentData, initiateIndexDB, fetchSetExams } from "../../utilities/fetchStudentData";
 import storageUtil from '../../utilities/storageUtil.js';
 import db from '../../db.js';
+import { clearAllTables } from './utils.js'
 import {
     account
 } from "../../appwriteConfig.js";
@@ -26,14 +27,15 @@ const Login = () => {
     const [emailLoginLoader, setEmailLoginLoader] = useState(false);
 
     //LOGOUT FUNCTION
+
     const handleLogout = async () => {
-        let sessionInfo = storageUtil.getItem("sessionInfo")
+        let sessionInfo = storageUtil.getItem("sessionInfo");
         if (sessionInfo && sessionInfo.$id) {
             try {
-                const response = await account.deleteSession(sessionInfo.$id); //Clears the session on Client's and Appwrite's side
+                const response = await account.deleteSession(sessionInfo.$id); // Clears the session on Client's and Appwrite's side
                 console.log('session deleted: ', response);
                 // Clear rest of stored data
-                sessionInfo = storageUtil.getItem("sessionInfo")
+                sessionInfo = storageUtil.getItem("sessionInfo");
                 localStorage.clear();
                 console.log('session cleared: ', sessionInfo);
             } catch (error) {
@@ -46,12 +48,11 @@ const Login = () => {
         // Clear userPoints from context and storage
         storageUtil.removeItem("userPoints");
 
-        // Clear IndexedDB
+        // Clear all tables in IndexedDB
         try {
-            await db.delete();  // Clears all data from the Dexie database
-            // console.log("IndexedDB cleared successfully");
+            await clearAllTables();
         } catch (error) {
-            console.error("Error clearing IndexedDB:", error);
+            console.error("Error clearing all tables:", error);
         }
 
         // Clear rest of stored data
@@ -130,19 +131,6 @@ const Login = () => {
             // await initiateIndexDB(userInfo)
 
             if (userInfo.userType === "student") {
-
-                // //Fetch Available Exams
-                // const availableExams = await fetchSetExams(userInfo.studClass, userInfo.stream)
-                // if (availableExams) {
-                //     console.log('Exams found: ', availableExams)
-                // }
-                // else {
-                //     console.log('Exams not found: ', availableExams)
-                // }
-                //Save data to indexDb
-                // await initiateIndexDB(userInfo)
-                await fetchSetExams(userInfo.studClass, userInfo.stream)
-
                 //Fetch student(s) results
                 console.log("Fetching student updated results");
                 await fetchAndUpdateResults(userInfo.userID);
@@ -153,16 +141,17 @@ const Login = () => {
             if (userInfo.userType === "admin") {
                 try {
                     console.log("Is admin");
-
-                    //FETCH ALL STUDENTS DATA -STORE IN LOCALSTORAGE
-                    // console.log("Fetching all students");
-                    // await fetchAndProcessStudentData();
-                    // console.log("Finished Fetching all students");
-
                     //FETCH ALL STUDENTS DATA -STORE IN INDEXDB
                     await initiateIndexDB(userInfo);
 
                 } catch (e) { console.error('Failed to retrieve student data', e); }
+            }
+
+            //Fetch exam data
+
+            const setExamsSaved = await fetchSetExams(userInfo)
+            if (setExamsSaved) {
+                console.log('Exams set: ', setExamsSaved)
             }
 
 

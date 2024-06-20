@@ -3,6 +3,7 @@ import {
     databases,
     database_id,
     updatedAttemptedQtnsTable_id,
+    examsTable_id,
     Query,
 } from "../../appwriteConfig.js"; //Data from appwrite database
 import {
@@ -26,13 +27,15 @@ import db from '../../db';  // Import your Dexie database
 export const getSelectedExam = async (examID) => {
     try {
         // Query the 'exams' table for exams with the specified examID
-        const examInformation = await db.exams
-            .where("examID")
-            .equalsIgnoreCase(examID)
-            .first(); // Use first() to get the first matching record
+        const examInformation = await databases.listDocuments(database_id, examsTable_id, [
+            Query.equal('examID', examID)
+        ])
+
+        console.log(examInformation);
 
         // Return the selected exam data, or an empty array if no record is found
-        return examInformation ? examInformation : [];
+        console.log('Exams retrieved: ', examInformation.documents);
+        return examInformation.documents ? examInformation.documents : [];
 
     } catch (error) {
         console.error('Error retrieving exam:', error);
