@@ -38,12 +38,12 @@ const SaveButton = forwardRef(({ selectedQuestions, onSubmit, disabled, buttonDi
 
     const dispatch = useDispatch();
 
-    const { userInfo, updateUserPoints, fetchUserPoints } = useAuth();
-    let studentID = userInfo.userId;
+    const { userInfo } = useAuth();
+    let studentID = userInfo.userID;
 
     let subjectName;
-    if (userInfo.educationLevel === 'PLE') {
-        subjectName = subject_Name === 'sst_ple' ? 'Social Studies' : (subject_Name === 'math_ple' ? 'Mathematics' : (subject_Name === 'sci_ple' ? 'Science' : 'English Language'));
+    if (subject_Name) {
+        subjectName = subject_Name === 'social_studies' ? 'Social Studies' : (subject_Name === 'mathematics' ? 'Mathematics' : (subject_Name === 'science' ? 'Science' : 'English Language'));
     } else {
         subjectName = subject_Name;
     }
@@ -258,53 +258,20 @@ const SaveButton = forwardRef(({ selectedQuestions, onSubmit, disabled, buttonDi
         const resultsString = JSON.stringify(formattedAnswers);
 
         const userResultsData = {
+            examID: '',
             studID: studentID,
             marks: totalMarks,
-            subject: subjectName,
+            subjectName: subjectName,
             results: resultsString,
-            totalPossibleMarks: totalPossibleMarks,
+            finalPossibleMarks: totalPossibleMarks,
             dateTime: moment().format('MMMM Do YYYY, h:mm:ss a'),
         };
 
-        if (isOffline) {
-            try {
-                console.log("Offline!");
-                let data = {
-                    studID: userInfo.userId,
-                    studInfo: {
-                        firstName: userInfo.firstName,
-                        lastName: userInfo.lastName,
-                        otherName: userInfo.otherName,
-                        educationLevel: userInfo.educationLevel,
-                        kinFirstName: userInfo.kinFirstName,
-                        kinLastName: userInfo.kinLastName,
-                        kinEmail: userInfo.kinEmail
-                    },
-                    subject: subjectName,
-                    marks: totalMarks,
-                    results: resultsString,
-                    totalPossibleMarks: totalPossibleMarks ? totalPossibleMarks : null,
-                    dateTime: moment().format('MMMM Do YYYY, h:mm:ss a'),
-                    kinEmail: userInfo.kinEmail ? userInfo.kinEmail : null,
-                };
-
-                await db.examAnswers.add(data);
-            } catch (e) {
-                console.error('Error saving ANSWERS to index db: ', e);
-            }
-        } else {
-            try {
-                await createDocument(userResultsData);
-
-                if (userInfo.kinEmail) {
-                    await sendEmailToNextOfKin(userInfo, subjectName, totalMarks, formatDate(new Date()));
-                }
-
-                await updateUserPoints(1, userInfo.userId);
-                let userFetchedResults = await fetchAndUpdateResults(userInfo.userId);
-            } catch (e) {
-                console.error('Error saving ANSWERS to cloud db');
-            }
+        try {
+            await createDocument(userResultsData);
+            let userFetchedResults = await fetchAndUpdateResults(userInfo.userID);
+        } catch (e) {
+            console.error('Error saving ANSWERS to cloud db');
         }
 
         const questionsData = formattedAnswers;

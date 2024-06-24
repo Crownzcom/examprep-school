@@ -29,6 +29,7 @@ import LinkedStudents from "./components/LinkedStudents";
 import EditProfile from "./components/EditProfile";
 import Answers from "./components/renderAnswer/Answers";
 import RegisteredStudents from "./pages/RegisteredStudents";
+import ScheduleExam from "./components/admin/ScheduleExam.js"
 import NotFoundPage from './components/NotFoundPage';
 import { AuthProvider, useAuth } from './context/AuthContext';
 // import './serviceWorkerListener.js';  // Service worker listener script
@@ -36,7 +37,7 @@ import "./App.css";
 
 function PrivateRoute({ children }) {
   const { userInfo, sessionInfo } = useAuth();
-  console.log('APP.JS session info: ', sessionInfo);
+  // console.log('APP.JS session info: ', sessionInfo);
   if (!userInfo || !sessionInfo) {
     // window.location.reload();
     return <Navigate to="/login" />;
@@ -86,6 +87,7 @@ function App() {
               <Route path="/linked-students" element={<PrivateRoute><LinkedStudents /></PrivateRoute>} />
               <Route path="/answers" element={<PrivateRoute><Answers /></PrivateRoute>} />
               <Route path="/registered-students" element={<PrivateRoute><RegisteredStudents /></PrivateRoute>} />
+              <Route path="/schedule-exam" element={<PrivateRoute><ScheduleExam /></PrivateRoute>} />
               <Route path="/initiate" element={<Initiate />} />
               <Route path="/login" element={<Login />} />
               <Route path="/sign-up" element={<SignUp />} />

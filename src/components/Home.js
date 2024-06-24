@@ -15,6 +15,7 @@ import { fetchStudents } from "../utilities/fetchStudentData";
 function Home() {
   const navigate = useNavigate();
   const { userInfo, updateQuestionSubjectData } = useAuth();
+  console.log('userInfo', userInfo)
   // const userInfo = storageUtil.getItem("userInfo");
   const isStudent = userInfo.userType === "student";
   const isAdmin = userInfo.userType === "admin";
@@ -87,7 +88,7 @@ function Home() {
                   <div className="col-md-4 mb-4">
                     <Card className="text-center">
                       <Card.Body>
-                        <Button variant="outline-primary" onClick={() => navigate('/sechedule-exam')}>
+                        <Button variant="outline-primary" onClick={() => navigate('/schedule-exam')}>
                           <FontAwesomeIcon icon={faArrowCircleUp} className="me-2" />
                           Schedule Exam
                         </Button>

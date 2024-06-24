@@ -6,6 +6,7 @@ import {
   studentMarksTable_id,
   subjectsTable_id,
   examsTable_id,
+  classesTable_id,
   Query,
 } from "../appwriteConfig.js";
 import { serverUrl } from "../config.js"
@@ -74,6 +75,69 @@ const updateExamData = async (examData) => {
   } catch (error) {
     console.error('Error updating exams:', error);
     throw new Error('Error updating exams table:', error);
+  }
+};
+
+//Updates subjects in index db
+export const updateSubjectsData = async () => {
+  try {
+
+    // Fetch Subjects
+    const subjects = await getDocs(subjectsTable_id, [])
+    console.log('Subjects found: ', subjects)
+
+    if (!db.isOpen()) {
+      await db.open();
+    }
+
+    await db.transaction('rw', db.subjects, async () => {
+      // Clear the existing entries in the exams table
+      await db.subjects.clear();
+
+      console.log('Saving to Subjects IndexDB ... ');
+      // Bulk put the new data after clearing the table
+      const savingToIndexDB = await db.subjects.bulkPut(subjects.map(subject => ({
+        ...subject,
+        subjectName: subject.subjectName,
+        examTableId: subject.examTableId,
+      })));
+
+      console.log('IndexDB response: ', savingToIndexDB);
+    });
+  } catch (error) {
+    console.error('Error updating subjects index db table:', error);
+    throw new Error('Error updating subjects index db table:', error);
+  }
+};
+
+//Updates classes in index db
+export const updateClassData = async () => {
+  try {
+
+    // Fetch Classes
+    const classes = await getDocs(classesTable_id, [])
+
+    if (!db.isOpen()) {
+      await db.open();
+    }
+
+    await db.transaction('rw', db.classes, async () => {
+      // Clear the existing entries in the exams table
+      await db.classes.clear();
+
+      console.log('Saving to Subjects IndexDB ... ');
+      // Bulk put the new data after clearing the table
+      const savingToIndexDB = await db.classes.bulkPut(classes.map(class_ => ({
+        ...class_,
+        classID: class_.classID,
+        streams: JSON.stringify(class_.streams),
+      })));
+
+      console.log('IndexDB response: ', savingToIndexDB);
+    });
+  } catch (error) {
+    console.error('Error updating classes index db table:', error);
+    throw new Error('Error updating classes index db table:', error);
   }
 };
 
@@ -175,9 +239,10 @@ export const fetchSetExams = async (userInfo) => {
     let examData = []
     if (userInfo.userType === 'student') {
       //fetch exams
+      console.log('fetch exam data for: class: ', userInfo.studClass, ' stream: ', userInfo.stream)
       examData = await getDocs(examsTable_id, [Query.and([
         Query.equal('classID', userInfo.studClass),
-        Query.contains('stream', userInfo.stream)
+        Query.contains('stream', [userInfo.stream])
       ])])
       console.log('Stud exam found: ', examData)
     }

@@ -20,26 +20,24 @@ import db from '../../db';  // Import your Dexie database
 
 /**
  * Retrieve a random exam for a given subject from the database
- * @param {string} subjectName - The name of the subject
+ * @param {string} examID - The name of the subject
  * @returns {Promise<object | string>} - The exam data or a message if not found
  */
-
 export const getSelectedExam = async (examID) => {
     try {
         // Query the 'exams' table for exams with the specified examID
         const examInformation = await databases.listDocuments(database_id, examsTable_id, [
-            Query.equal('examID', examID)
-        ])
+            Query.equal("examID", examID),
+        ]);
 
-        console.log(examInformation);
+        console.log("Exams retrieved: ", examInformation.documents);
 
         // Return the selected exam data, or an empty array if no record is found
-        console.log('Exams retrieved: ', examInformation.documents);
-        return examInformation.documents ? examInformation.documents : [];
+        return examInformation.documents.length > 0 ? examInformation.documents[0] : {};
 
     } catch (error) {
-        console.error('Error retrieving exam:', error);
-        throw new Error('Error retrieving exam data');  // Handle errors appropriately
+        console.error("Error retrieving exam:", error);
+        throw new Error("Error retrieving exam data"); // Handle errors appropriately
     }
 };
 

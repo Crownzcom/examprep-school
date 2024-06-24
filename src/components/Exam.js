@@ -1,59 +1,66 @@
 import React, { useState, useEffect } from "react";
-import IframeComponent from "./IframeComponent";
-// import QuizContainer from "./sst_ple/QuizContainer";
 import QuizContainer from "./renderQuiz/QuizContainer";
 import { Modal, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import {
-  databasesQ,
-  database_idQ,
-  sstTablePLE_id,
-  mathPLE_id,
-  engTbalePLE_id,
-  sciTablePLE_id,
-  QueryQ,
-} from "./renderQuiz/examsAppwriteConfig"; //Data from appwrite database
-import { useAuth } from "../context/AuthContext.js"
-import { getSelectedExam } from "./renderQuiz/utils"
-import { sst_ple, math_ple, eng_ple } from '../otherFiles/questionsData'; //Static data from local files
+  databases,
+  database_id,
+  examsTable_id,
+  Query,
+} from "../appwriteConfig.js"; // Data from appwrite database
+import { getSelectedExam } from "./renderQuiz/utils.js"
+import { useAuth } from "../context/AuthContext";
 
 /**
  * Represents an Exam component.
  * @param {Object} props - The component props.
- * @param {string} props.subject - The subject of the exam.
+ * @param {string} props.examID - The ID of the exam.
  * @returns {JSX.Element} The Exam component.
  */
 function Exam({ examID }) {
   const [showInstructionsModal, setShowInstructionsModal] = useState(true);
-  const [showUnavailableModal, setshowUnavailableModal] = useState(true);
+  const [showUnavailableModal, setShowUnavailableModal] = useState(true);
   const [data, setData] = useState(null); // Variable to store the fetched questions data
-  const [subject, setSubject] = useState('')
-
-  const { userInfo } = useAuth();
+  const [subject, setSubject] = useState("");
 
   const navigate = useNavigate();
+
+  // Get Exam by ID
+  // const getSelectedExam = async (examID) => {
+  //   try {
+  //     // Query the 'exams' table for exams with the specified examID
+  //     const examInformation = await databases.listDocuments(database_id, examsTable_id, [
+  //       Query.equal("examID", examID),
+  //     ]);
+
+  //     console.log("Exams retrieved: ", examInformation.documents);
+
+  //     // Return the selected exam data, or an empty array if no record is found
+  //     return examInformation.documents.length > 0 ? examInformation.documents[0] : {};
+
+  //   } catch (error) {
+  //     console.error("Error retrieving exam:", error);
+  //     throw new Error("Error retrieving exam data"); // Handle errors appropriately
+  //   }
+  // };
 
   useEffect(() => {
     // Fetch data from your cloud Appwrite database
     const fetchData = async () => {
       try {
+        let questionData = await getSelectedExam(examID);
 
-        const test = await databasesQ.listDocuments(database_idQ, engTbalePLE_id)
-        console.log(test)
-        let questionData = []
-        questionData = await getSelectedExam(examID);
-        console.log('Retrieved Exam Information: ', questionData[0].examQuestions);
+        setSubject(questionData.subjectName);
+        console.log("Subject: ", questionData.subjectName);
 
-        // if (JSON.stringify(questionData[0].examQuestions.length < 0)) {
-        //   // navigate(-1);
-        //   console.log('no exam found');
-        // }
+        if (!questionData.examQuestions || JSON.parse(questionData.examQuestions).length < 1) {
+          navigate(-1);
+          console.log("no exam found");
+          return;
+        }
 
-
-        setSubject(questionData[0].subJectName)
-        setData(JSON.parse(questionData[0].examQuestions)); // Assign the fetched data to the variable
-
+        setData(JSON.parse(questionData.examQuestions));
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -62,18 +69,15 @@ function Exam({ examID }) {
     fetchData(); // Call the fetchData function to fetch the data
 
     // Cleanup function
-    return () => {
-    };
-  }, []); // Empty dependency array ensures the code runs only once
-
+    return () => { };
+  }, [examID, navigate]); // Dependency array ensures the code runs only once when examID changes
 
   const handleProceed = () => {
-    if (subject === 'social-studies_ple' || subject === 'mathematics_ple' || subject === 'english-language_ple' || subject === 'science_ple') {
+    if (subject === "social_studies" || subject === "mathematics" || subject === "english_language" || subject === "science") {
       setShowInstructionsModal(false);
-    }
-    else {
+    } else {
       setShowInstructionsModal(false);
-      // setshowUnavailableModal(false); // Set the subject validity to false
+      setShowUnavailableModal(false); // Set the subject validity to false
     }
   };
 
@@ -82,19 +86,18 @@ function Exam({ examID }) {
   };
 
   const renderQuizContent = () => {
-    return <QuizContainer questionsData={data} subjectName={'subject'} />;
+    return <QuizContainer questionsData={data} subjectName={subject} />;
   };
 
   const subjectInstructions = () => {
-    // console.log('Subject Name: ', subject);
-    return (
-      subject === ('mathematics_ple' || 'mathematics_uce' || 'mathematics_uace') ?
-        <>
-          <li>Have a piece of paper, pen/pencil, and calculator ready for calculations. </li>
-        </>
-        : <></>
-    )
-  }
+    return subject === "mathematics" ? (
+      <>
+        <li>Have a piece of paper, pen/pencil, and calculator ready for calculations.</li>
+      </>
+    ) : (
+      <></>
+    );
+  };
 
   return (
     <>
@@ -129,8 +132,8 @@ function Exam({ examID }) {
 
       {!showInstructionsModal && showUnavailableModal && renderQuizContent()}
 
-      {!showUnavailableModal &&
-        <Modal show={true} onHide={() => { }} centered styles={{ width: '40%', height: '40%' }}>
+      {!showUnavailableModal && (
+        <Modal show={true} onHide={() => { }} centered styles={{ width: "40%", height: "40%" }}>
           <Modal.Header>
             <Modal.Title>Exam Unavailable</Modal.Title>
           </Modal.Header>
@@ -143,7 +146,7 @@ function Exam({ examID }) {
             </Button>
           </Modal.Footer>
         </Modal>
-      }
+      )}
     </>
   );
 }

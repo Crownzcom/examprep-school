@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faLock } from '@fortawesome/free-solid-svg-icons';
 import { useAuth } from "../../context/AuthContext.js";
 import { fetchAndUpdateResults } from "../../utilities/resultsUtil";
-import { fetchAndProcessStudentData, initiateIndexDB, fetchSetExams } from "../../utilities/fetchStudentData";
+import { fetchAndProcessStudentData, initiateIndexDB, fetchSetExams, updateSubjectsData, updateClassData } from "../../utilities/fetchStudentData";
 import storageUtil from '../../utilities/storageUtil.js';
 import db from '../../db.js';
 import { clearAllTables } from './utils.js'
@@ -117,7 +117,7 @@ const Login = () => {
         try {
             setEmailLoginLoader(true);
 
-            console.log('Setting up email session');
+            console.log('Setting up email session. email: ', email, ' passwords: ', password);
             const sessionData = await account.createEmailPasswordSession(email, password);
             console.log('Email session created: ', sessionData);
 
@@ -148,12 +148,16 @@ const Login = () => {
             }
 
             //Fetch exam data
-
             const setExamsSaved = await fetchSetExams(userInfo)
             if (setExamsSaved) {
                 console.log('Exams set: ', setExamsSaved)
             }
 
+            //Fetch Subjects data
+            await updateSubjectsData();
+
+            //Update classes data
+            await updateClassData();
 
             // Redirect to home page
             console.log('Successfully logged in');

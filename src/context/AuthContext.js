@@ -61,7 +61,7 @@ export const AuthProvider = ({ children }) => {
         storageUtil.setItem("sessionInfo", sessionDetails);
 
         const userDetails = {
-            userID: sessionData.userID,
+            userID: userData.userID,
             userDocId: userData.$id,
             firstName: userData.firstName,
             lastName: userData.lastName,
@@ -75,6 +75,7 @@ export const AuthProvider = ({ children }) => {
         };
 
         setUserInfo(userDetails);
+        console.log('user info set: ', userInfo)
         storageUtil.setItem("userInfo", userDetails);
 
         if (userDetails.userType === "student") {

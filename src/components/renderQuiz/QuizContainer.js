@@ -46,7 +46,7 @@ const QuizContainer = ({ questionsData, subjectName }) => {
             fetchAndSetQuestions();
         }
 
-    }, [questionsData, subjectName, userInfo.userId, userInfo.educationLevel]);
+    }, [questionsData, subjectName, userInfo.userID]);
 
     const handleOpenModal = () => {
         setShowModal(true);
