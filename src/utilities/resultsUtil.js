@@ -6,24 +6,12 @@ import {
   studentMarksTable_id,
   Query,
 } from "../appwriteConfig";
+import db from "../db";
+import { updateResultsData } from "./fetchStudentData"
 import storageUtil from "./storageUtil";
 
-export async function fetchAndUpdateResults(userId) {
-  try {
-    const response = await databases.listDocuments(
-      database_id,
-      studentMarksTable_id,
-      [Query.equal("studID", userId), Query.limit(500)]
-    );
-    // Update local storage with new results
-    storageUtil.setItem("examResults", "");
-    storageUtil.setItem("examResults", response.documents);
-    console.log("Updated results: ", response.documents);
-    return response.documents;
-  } catch (error) {
-    console.error("Failed to retrieve student results:", error);
-    return null;
-  }
+export async function fetchAndUpdateResults(studID) {
+  await updateResultsData(studID)
 }
 /*=========END FETCH DATA FROM DB TO UPDATE LOCALSTORAGE=========*/
 
@@ -40,36 +28,47 @@ export const formatDate = (dateTime) => {
   });
 };
 
-export const getTransformedResults = (studentId) => {
-  const userResults = storageUtil.getItem("examResults") || [];
+export const getTransformedResults = async (studentId) => {
+  // Fetch results from the Dexie database
+  const userResults = await db.results.toArray();
+  // console.log('user results: ', userResults)
   const resultsMap = new Map();
 
   userResults.forEach((doc) => {
-    // studID,	studInfo, subject, marks, dateTime, results, totalPossibleMarks
-    const subject = doc.subject;
-    const dateTime = formatDate(doc.$createdAt);
+    const resultsID = doc.resultsID;
+    const subject = doc.subjectName;
+    const dateTime = formatDate(doc.dateTime);
     const score = doc.marks;
-    const totalPossibleMarks = doc.totalPossibleMarks;
+    const totalPossibleMarks = doc.finalPossibleMarks;
 
     if (!resultsMap.has(subject)) {
       resultsMap.set(subject, { subject, attempts: [] });
     }
 
     resultsMap.get(subject).attempts.push({
+      resultsID,
       dateTime,
       score,
       totalPossibleMarks,
       subject,
-      resultDetails: doc.results,
     });
   });
 
-  // Sort each subject's attempts by date in descending order
-  resultsMap.forEach((subjectData) => {
-    subjectData.attempts.sort((a, b) => new Date(b.dateTime) - new Date(a.dateTime));
-  });
+  // console.log('returned results: ', Array.from(resultsMap.values()))
 
   return Array.from(resultsMap.values());
 };
 
 /*=========END TRANSFORMS THE RESULTS=========*/
+
+/*=========FETCH RESULTS FOR A PARTICULAR RESULTS ID================*/
+export const fetchResults = async (resultID, studID) => {
+  try {
+    const results = await databases.listDocuments(database_id, studentMarksTable_id, [Query.equal('$id', resultID)]);
+    // console.log('Finsihed fetching: ', results.documents[0].results);
+    return results.documents[0].results;
+  } catch (err) {
+    console.error(`Failed to fetch results for ${resultID}. studentID: ${studID}\n${err}`)
+    throw new Error(`Failed to fetch results for ${resultID}. studentID: ${studID}\n${err}`)
+  }
+}

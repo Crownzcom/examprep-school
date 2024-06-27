@@ -3,9 +3,11 @@
 export const setUserAnswer = (questionId, answer, categoryId, isEitherOr, questionType) => {
     let payload = { questionId, answer, categoryId, isEitherOr, questionType };
 
+    // console.log(payload);
+
     // If the question type is checkbox, convert the answer to an object
     if (questionType === 'check_box') {
-        payload.answer = answer.reduce((acc, curr) => ({ ...acc, [curr]: true }), {});
+        payload.answer = answer.reduce((acc, curr) => ({ ...acc, [curr]: true }), []);
     }
 
     // If the question type is drag and drop, ensure the answer is an array

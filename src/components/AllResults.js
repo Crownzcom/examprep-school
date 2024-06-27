@@ -5,6 +5,7 @@ import {
   Row,
   Col,
   Card,
+  Modal,
   Button,
   Alert,
   Spinner,
@@ -21,11 +22,18 @@ import {
   faCaretDown,
   faCaretUp,
 } from "@fortawesome/free-solid-svg-icons";
+import {
+  databases,
+  database_id,
+  studentMarksTable_id,
+  Query,
+} from "../appwriteConfig";
 import "./AllResults.css";
-import storageUtil from "../utilities/storageUtil";
+import { useAuth } from "../context/AuthContext";
 import {
   fetchAndUpdateResults,
   getTransformedResults,
+  fetchResults,
 } from "../utilities/resultsUtil";
 import SelectExam from "./SelectExam";
 import HeroHeader from "./HeroHeader";
@@ -33,32 +41,79 @@ import HeroHeader from "./HeroHeader";
 const AllResults = () => {
   const [openSubjects, setOpenSubjects] = useState({}); // State to track the open state of each subject
   const [results, setResults] = useState([]);
+  const [resultsId, setResultsId] = useState('')
   const [refreshResults, setRefreshResults] = useState(false);
+  const [noResultsData, setNoResultsData] = useState(false);
   const [currentPage, setCurrentPage] = useState({});
 
+  const handleClose = () => setNoResultsData(false); //Close modal
+
   const itemsPerPage = 5; // Number of results per page
-  const userInfo = storageUtil.getItem("userInfo");
+  const { userInfo } = useAuth();
   const navigate = useNavigate();
 
-  const viewResults = (resultDetails, subjectName, totalMarks, attemptDate) => {
-    if (subjectName === "English Language") {
-      navigate("/exam-results", { state: { results: resultDetails } });
-    }
-    else {
-      const questionsData = JSON.parse(resultDetails);
-      navigate('/answers', { state: { questionsData, subjectName, totalMarks, attemptDate } });
+  const viewResults = async (resultsID, subjectName, totalMarks, attemptDate, totalPossibleMarks) => {
+    try {
+      setResultsId(resultsID);
+      // console.log(`fecthing results..resultsID: ${resultsID}`)
+      const results = await fetchResults(resultsID, userInfo.userID);
+      // console.log('Finsihed fetching');
+      const questionsData = JSON.parse(results);
+
+      if (Array.isArray(questionsData)) {
+        if (questionsData.length < 1) {
+          // console.log('No results found');
+          setNoResultsData(true);
+          return
+        }
+        setNoResultsData(false);
+        //questionsData, subjectName, totalMarks, attemptDate, totalPossibleMarks
+        navigate('/answers', { state: { questionsData, subjectName, totalMarks, attemptDate, totalPossibleMarks } });
+        // navigate('/answers', { state: { questionsData, subjectName, totalMarks, attemptDate } });
+      }
+      else {
+        // console.log('No results to render: ', questionsData);
+        setNoResultsData(true);
+      }
+
+    } catch (err) {
+      console.error('Failed to either fetch results data, or navigate to answers page', err);
+      throw new Error('Failed to navigate to answers page: ', err);
     }
   };
 
+  const calculatePercentageScore = (totalMarks, totalPossibleMarks) => {
+    let totalScore = parseFloat(totalMarks);
+    let totalPossibleScore = parseFloat(totalPossibleMarks);
+    // console.log(`Total Score: ${totalScore}, Possible Score: ${totalPossibleScore}`);
+
+    if (isNaN(totalScore)) {
+      // console.log('Invalid score values');
+      return null;
+    }
+
+    if (totalPossibleScore === 0 || isNaN(totalPossibleScore)) {
+      // console.log('Total possible score is 0, cannot calculate percentage');
+      return totalScore;
+    }
+
+    let percentage = (totalScore / totalPossibleScore) * 100;
+    let roundedPercentage = Math.round(percentage * 10) / 10;
+    // console.log('Percentage calculated: ' + roundedPercentage + '%');
+    return `${roundedPercentage}`;
+  };
+
   useEffect(() => {
-    const userId = userInfo?.userId;
-    if (userId) {
-      const transformedData = getTransformedResults(userId);
-      if (JSON.stringify(transformedData) !== JSON.stringify(results)) {
+    const fetchResults = async () => {
+      const userID = userInfo?.userID;
+      if (userID) {
+        const transformedData = await getTransformedResults(userID);
         setResults(transformedData);
       }
-    }
-  }, [userInfo, results]); // Only re-run the effect if userInfo or results change
+    };
+
+    fetchResults();
+  }, [userInfo]); // Only re-run the effect if userInfo changes
 
   // Toggle the open state of a subject and reset its pagination
   const toggleSubject = (subject) => {
@@ -100,7 +155,7 @@ const AllResults = () => {
 
   async function updateResults() {
     setRefreshResults(true);
-    await fetchAndUpdateResults(userInfo.userId);
+    await fetchAndUpdateResults(userInfo.userID);
     setRefreshResults(false);
     navigate("/all-results");
   }
@@ -190,7 +245,7 @@ const AllResults = () => {
                 <tr>
                   <th>No.</th>
                   <th>Date</th>
-                  <th>Score</th>
+                  <th>Score (%)</th>
                   <th>Action</th>
                 </tr>
               </thead>
@@ -202,13 +257,13 @@ const AllResults = () => {
                     <tr key={idx}>
                       <td>{absoluteNumber}</td>
                       <td>{attempt.dateTime}</td>
-                      <td>{attempt.score}</td>
+                      <td>{calculatePercentageScore(attempt.score, attempt.totalPossibleMarks)}</td>
                       <td>
-                        {attempt.resultDetails ? (
+                        {attempt.resultsID ? (
                           <Button
                             // className='btn-cancel'
                             variant="dark"
-                            onClick={() => viewResults(attempt.resultDetails, subjectResults.subject, attempt.score, attempt.dateTime)}
+                            onClick={async () => { await viewResults(attempt.resultsID, subjectResults.subject, attempt.score, attempt.dateTime, attempt.totalPossibleMarks) }}
                           >
                             <FontAwesomeIcon icon={faEye} className="me-2" />
                             Exam Results
@@ -278,8 +333,27 @@ const AllResults = () => {
           )}
         </Row>
       </Container>
+
+      {/* MODAL TO SHOW RESULTS DATA NOT AVAILABLE TO RENDER */}
+      <Modal show={noResultsData} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Results Unvailable!</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <b>Results ID: {resultsId}</b>
+          <p>
+            The results for this exam can not be displayed. They are either missing or not supported to be displayed.
+          </p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </>
   );
 };
 
 export default AllResults;
+

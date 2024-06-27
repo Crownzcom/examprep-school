@@ -15,7 +15,6 @@ import { fetchStudents } from "../utilities/fetchStudentData";
 function Home() {
   const navigate = useNavigate();
   const { userInfo, updateQuestionSubjectData } = useAuth();
-  console.log('userInfo', userInfo)
   // const userInfo = storageUtil.getItem("userInfo");
   const isStudent = userInfo.userType === "student";
   const isAdmin = userInfo.userType === "admin";

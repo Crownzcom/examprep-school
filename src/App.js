@@ -29,7 +29,7 @@ import LinkedStudents from "./components/LinkedStudents";
 import EditProfile from "./components/EditProfile";
 import Answers from "./components/renderAnswer/Answers";
 import RegisteredStudents from "./pages/RegisteredStudents";
-import ScheduleExam from "./components/admin/ScheduleExam.js"
+import ScheduleExam from "./components/scheduleExam/ScheduleExam.js"
 import NotFoundPage from './components/NotFoundPage';
 import { AuthProvider, useAuth } from './context/AuthContext';
 // import './serviceWorkerListener.js';  // Service worker listener script

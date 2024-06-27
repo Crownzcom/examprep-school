@@ -5,7 +5,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChartLine, faEdit } from "@fortawesome/free-solid-svg-icons";
 import RecentResults from "../RecentResults";
 import { useNavigate } from "react-router-dom";
-import { getTransformedResults } from "../../utilities/resultsUtil";
+import {
+  getTransformedResults,
+  fetchResults,
+} from "../../utilities/resultsUtil";
 import { useAuth } from "../../context/AuthContext";
 
 
@@ -13,37 +16,55 @@ const StudentDashboard = () => {
   const navigate = useNavigate();
   const { userInfo } = useAuth();
   const [results, setResults] = useState([]);
-
-  // const viewResults = (resultDetails, subjectName, totalMarks, attemptDate) => {
-  //   if (subjectName === "English Language") {
-  //     navigate("/exam-results", { state: { results: resultDetails } });
-  //   }
-  //   else {
-  //     const questionsData = JSON.parse(resultDetails);
-  //     navigate('/answers', { state: { questionsData, subjectName, totalMarks, attemptDate } });
-  //   }
-  // };
+  const [resultsId, setResultsId] = useState('')
+  const [noResultsData, setNoResultsData] = useState(false);
 
   //To view student results
-  function viewResults(resultDetails, subjectName, totalMarks, totalPossibleMarks, attemptDate) {
-    // console.log(`total marks: ${totalMarks}, possible marks: ${totalPossibleMarks}`);
-    if (subjectName === "English Language") {
-      navigate("/exam-results", { state: { results: resultDetails } });
-    } else {
-      const questionsData = JSON.parse(resultDetails);
-      navigate('/answers', { state: { questionsData, subjectName, totalMarks, totalPossibleMarks, attemptDate } }); // questionsData, subjectName, totalMarks, attemptDate, totalPossibleMarks 
+  const viewResults = async (resultsID, subjectName, totalMarks, attemptDate, totalPossibleMarks) => {
+    try {
+      setResultsId(resultsID);
+      console.log(`fecthing results..resultsID: ${totalPossibleMarks}`)
+      const results = await fetchResults(resultsID, userInfo.userID);
+      // console.log('Finsihed fetching', results);
+
+      const questionsData = JSON.parse(results);
+
+      if (Array.isArray(questionsData)) {
+        if (questionsData.length < 1) {
+          // console.log('No results found');
+          setNoResultsData(true);
+          return
+        }
+        setNoResultsData(false);
+        //questionsData, subjectName, totalMarks, attemptDate, totalPossibleMarks
+        navigate('/answers', { state: { questionsData, subjectName, totalMarks, attemptDate, totalPossibleMarks } });
+      }
+      else {
+        // console.log('No results to render: ', questionsData);
+        setNoResultsData(true);
+      }
+
+    } catch (err) {
+      console.error('Failed to either fetch results data, or navigate to answers page', err);
+      throw new Error('Failed to navigate to answers page: ', err);
     }
-  }
+  };
 
   useEffect(() => {
-    const userId = userInfo?.userId;
-    if (userId) {
-      const transformedData = getTransformedResults(userId);
-      if (JSON.stringify(transformedData) !== JSON.stringify(results)) {
+    const userID = userInfo?.userID;
+    const results = async () => {
+      if (userID) {
+        const transformedData = await getTransformedResults(userID);
+        // if (JSON.stringify(transformedData) !== JSON.stringify(results)) {
+        //   setResults(transformedData);
+        // }
         setResults(transformedData);
       }
-    }
-  }, [userInfo, results]); // Only re-run the effect if userInfo or results change
+    };
+
+    results();
+
+  }, [userInfo]); // Only re-run the effect if userInfo or results change
 
   const attemptExam = () => {
     navigate("/exam-page");

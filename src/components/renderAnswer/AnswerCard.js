@@ -45,74 +45,71 @@ const AnswerCard = ({ resultsData, questionIndex, category_Id }) => {
     const renderQuestionText = (data, questionText, questionImage, explanation, answer, user_answer, questionType, mark) => {
 
         /**
-         * Checking Answer, and Scoring.
-         * Normalization to answers (bothe user-answers and given answer options) before comparison
-         * Removes special characters (all question types) and extra spaces (only text-type).)
-        */
-        const checkAnswer = (answer, user_answer, questionType, mark) => {
-            // General normalize function for non-text questions
-            const normalizeGeneral = value => typeof value === 'string' ? value.trim().toLowerCase() : value;
+       * Checking Answer, and Scoring.
+       * Normalization to answers (both user-answers and given answer options) before comparison.
+       * Removes special characters (all question types) and extra spaces (only text-type).
+       */
+        const checkAnswer = (answer, user_answer, questionType, mark = 1) => {
+            const normalize = (value, isText = false) => {
+                if (typeof value !== 'string') return value;
+                let normalizedValue = value.trim().toLowerCase();
+                if (isText) {
+                    normalizedValue = normalizedValue.replace(/[\s\.,\-_!@#$%^&*()=+{}[\]\\;:'"<>/?|`~]+/g, '').replace(/\s+/g, ' ');
+                }
+                return normalizedValue;
+            };
 
-            // Specialized normalize function for text questions
-            const normalizeText = value => typeof value === 'string' ?
-                value.replace(/[\s\.,\-_!@#$%^&*()=+{}[\]\\;:'"<>/?|`~]+/g, '') // Remove special characters
-                    .replace(/\s+/g, ' ') // Replace multiple spaces with a single space
-                    .trim() // Remove leading and trailing spaces
-                    .toLowerCase() // Convert to lowercase to make comparison case-insensitive
-                : value;
+            const normalizeArray = (arr, isText) => arr.map(value => normalize(value, isText));
 
-            // Decide which normalization to use based on question type
             if (questionType === 'text') {
-                user_answer = Array.isArray(user_answer) ? user_answer.map(normalizeText) : normalizeText(user_answer);
-                answer = Array.isArray(answer) ? answer.map(normalizeText) : normalizeText(answer);
+                user_answer = Array.isArray(user_answer) ? normalizeArray(user_answer, true) : normalize(user_answer, true);
+                answer = Array.isArray(answer) ? normalizeArray(answer, true) : normalize(answer, true);
             } else {
-                user_answer = Array.isArray(user_answer) ? user_answer.map(normalizeGeneral) : normalizeGeneral(user_answer);
-                answer = Array.isArray(answer) ? answer.map(normalizeGeneral) : normalizeGeneral(answer);
+                user_answer = Array.isArray(user_answer) ? normalizeArray(user_answer) : normalize(user_answer);
+                answer = Array.isArray(answer) ? normalizeArray(answer) : normalize(answer);
             }
 
             let score = 0;
-            let maxScore = 0;
+            let maxScore = mark;
 
-            if (questionType === 'multipleChoice') {
-                maxScore = mark || 1; // Assign the max score to mark if available, otherwise 1
-                if (answer === user_answer || (Array.isArray(answer) && answer.includes(user_answer))) {
-                    score = mark || 1; // Use provided mark or default to 1
-                }
-            } else if (questionType === 'text') {
-                maxScore = mark || 1; // Assign the max score to mark if available, otherwise 1
-                // Single mark for text, check if answer matches
-                if (answer === user_answer || (Array.isArray(answer) && answer.includes(user_answer))) {
-                    score = mark || 1; // Use provided mark or default to 1
-                }
-            } else if (questionType === 'check_box') {
-                maxScore = mark || (Array.isArray(answer) ? answer.length : 1);
-                if (Array.isArray(user_answer)) {
-                    user_answer.forEach(val => {
-                        if (answer.includes(val)) {
-                            score++;
-                        }
-                    });
-                    score = Math.min(score, maxScore); // Limit score to maxScore
-                }
-            } else if (questionType === 'dragAndDrop') {
-                maxScore = mark || 1; // Assign the max score to mark if available, otherwise 1
-                if (Array.isArray(user_answer) && Array.isArray(answer) && user_answer.length === answer.length) {
-                    let isCorrect = true;
-                    for (let i = 0; i < answer.length; i++) {
-                        if (normalizeGeneral(user_answer[i]) !== normalizeGeneral(answer[i])) {
-                            isCorrect = false;
-                            break;
+            switch (questionType) {
+                case 'multipleChoice':
+                    if (answer === user_answer || (Array.isArray(answer) && answer.includes(user_answer))) {
+                        score = mark;
+                    }
+                    break;
+
+                case 'text':
+                    if (answer === user_answer || (Array.isArray(answer) && answer.includes(user_answer))) {
+                        score = mark;
+                    }
+                    break;
+
+                case 'check_box':
+                    maxScore = Array.isArray(answer) ? answer.length : mark;
+                    if (Array.isArray(user_answer)) {
+                        score = user_answer.reduce((acc, val) => acc + (answer.includes(val) ? 1 : 0), 0);
+                        score = Math.min(score, maxScore);
+                    }
+                    break;
+
+                case 'dragAndDrop':
+                    if (Array.isArray(user_answer) && Array.isArray(answer) && user_answer.length === answer.length) {
+                        const isCorrect = user_answer.every((val, index) => normalize(val) === normalize(answer[index]));
+                        if (isCorrect) {
+                            score = mark;
                         }
                     }
-                    if (isCorrect) {
-                        score = mark || 1;
-                    }
-                }
+                    break;
+
+                default:
+                    break;
             }
 
             return { score, maxScore };
         };
 
+        // Example usage
         const { score, maxScore } = checkAnswer(answer, user_answer, questionType, mark);
 
         return (

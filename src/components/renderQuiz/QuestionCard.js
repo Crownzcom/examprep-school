@@ -63,31 +63,7 @@ const QuestionCard = ({ questionIndex, question, isEitherOr, categoryId, setUser
     );
 
     const renderQuestion = (currentQuestion, disabled) => {
-        // if (currentQuestion.type === 'dragAndDrop') {
-        //     console.log('drag and drop: ', currentQuestion)
-        //     return <>
-        //         {/* Drag and drop elements go here - renderDragAndDropElements() function, or edit the renderQuestionText() to also support drag and drop elements which can be dragged in the answer input section*/}
-        //         <AnswerInput
-        //             question={currentQuestion}
-        //             onChange={(answer) => handleAnswerChange(currentQuestion.id, answer, currentQuestion.type)}
-        //             getUserAnswer={getUserAnswer}
-        //             disabled={disabled}
-        //             displayQuestionText={false}
-        //         />
-        //         {currentQuestion.sub_questions && currentQuestion.sub_questions.map((subQ, index) => (
-        //             <AnswerInput
-        //                 key={`${currentQuestion.id}_sub_${index}`}
-        //                 question={subQ}
-        //                 onChange={(answer) => handleAnswerChange(currentQuestion.id, answer, subQ.type, index)}
-        //                 getUserAnswer={() => getUserAnswer(`${currentQuestion.id}_sub_${index}`)}
-        //                 disabled={false}
-        //                 displayQuestionText={true}
-        //                 questionNumber={indexToRoman(index)}
-        //             />
-        //         ))}
-        //     </>
-        // }
-        // else {
+        currentQuestion.sub_questions && console.log('subQ', currentQuestion.sub_questions);
         return <>
             {renderQuestionText(currentQuestion.question, currentQuestion.image, currentQuestion.type)}
             <AnswerInput
@@ -99,10 +75,10 @@ const QuestionCard = ({ questionIndex, question, isEitherOr, categoryId, setUser
             />
             {currentQuestion.sub_questions && currentQuestion.sub_questions.map((subQ, index) => (
                 <AnswerInput
-                    key={`${currentQuestion.id}_sub_${index}`}
+                    key={subQ.id ? subQ.id : `${currentQuestion.id}_sub_${index}`}
                     question={subQ}
-                    onChange={(answer) => handleAnswerChange(currentQuestion.id, answer, subQ.type, index)}
-                    getUserAnswer={() => getUserAnswer(`${currentQuestion.id}_sub_${index}`)}
+                    onChange={(answer) => handleAnswerChange((subQ.id ? subQ.id : currentQuestion.id), answer, subQ.type, (subQ.id ? null : index))} //if subquestion has id assigned, pass it, or else pass the main question id and the subquestion index itself
+                    getUserAnswer={() => getUserAnswer(subQ.id ? subQ.id : `${currentQuestion.id}_sub_${index}`)}
                     disabled={false}
                     displayQuestionText={true}
                     questionNumber={indexToRoman(index)}

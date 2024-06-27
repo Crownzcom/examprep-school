@@ -7,24 +7,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useNavigate } from "react-router-dom";
 import moment from 'moment';
 import { faSave } from '@fortawesome/free-solid-svg-icons';
-import {
-    databases,
-    database_id,
-    studentMarksTable_id,
-} from "../../appwriteConfig.js";
-import useNetworkStatus from '../../hooks/useNetworkStatus.js'; // Custom hook to check network status
-import {
-    fetchAndUpdateResults, formatDate
-} from "../../utilities/resultsUtil";
-import { sendEmailToNextOfKin } from "../../utilities/otherUtils.js";
+import { formatDate } from "../../utilities/resultsUtil";
+import { updateResultsData } from "../../utilities/fetchStudentData";
 import { useAuth } from '../../context/AuthContext';
-import db from '../../db.js';
+import { serverUrl } from '../../config.js';
 
-const SaveButton = forwardRef(({ selectedQuestions, onSubmit, disabled, buttonDisplay, subject_Name }, ref) => {
-
+const SaveButton = forwardRef(({ selectedQuestions, onSubmit, disabled, buttonDisplay, subject_Name, examID }, ref) => {
     const [modifiedSelectedQuestions, setModifiedSelectedQuestions] = useState(selectedQuestions);
-
-    const isOffline = !useNetworkStatus(); // Using custom hook to check network status
 
     // Assigning IDs to the subquestions of the selected questions
     useEffect(() => {
@@ -37,7 +26,6 @@ const SaveButton = forwardRef(({ selectedQuestions, onSubmit, disabled, buttonDi
     }, [selectedQuestions]);
 
     const dispatch = useDispatch();
-
     const { userInfo } = useAuth();
     let studentID = userInfo.userID;
 
@@ -50,16 +38,40 @@ const SaveButton = forwardRef(({ selectedQuestions, onSubmit, disabled, buttonDi
 
     const navigate = useNavigate();
 
-    const reduxState = useSelector(state => state.answers);
+    const results = useSelector(state => state.answers);
+    console.log('redux results: ', results);
 
-    const [isLoading, setIsLoading] = useState(false);
+    const transformAndRemoveDuplicates = (answers) => {
+        const transformedAnswers = answers.map(answer => {
+            // Transform user_answer to array if it's an object
+            if (typeof answer.user_answer === 'object' && !Array.isArray(answer.user_answer)) {
+                answer.user_answer = Object.keys(answer.user_answer);
+            } else if (typeof answer.user_answer === 'string') {
+                // Ensure the user_answer is in array format
+                answer.user_answer = [answer.user_answer];
+            }
+            return answer;
+        });
 
-    // Function to assign ids to subquestions without ids
+        // Create a map to keep only the last occurrence of each ID
+        const answerMap = new Map();
+        transformedAnswers.forEach(answer => {
+            answerMap.set(answer.id, answer);
+        });
+
+        // Convert the map back to an array
+        const uniqueAnswers = Array.from(answerMap.values());
+
+        return uniqueAnswers;
+    };
+
+    const reduxState = transformAndRemoveDuplicates(results);
+    console.log('transformed results:', results)
+
     const assignSubQuestionIds = async (questions) => {
         questions.forEach(question => {
             if (question.questions) {
                 question.questions.forEach(mainQuestion => {
-                    // Assign IDs only to subquestions of questions that are not in 'either' or 'or' structure
                     if (mainQuestion.sub_questions && !mainQuestion.either && !mainQuestion.or) {
                         mainQuestion.sub_questions.forEach((subQuestion, subIndex) => {
                             if (!subQuestion.id) {
@@ -72,39 +84,46 @@ const SaveButton = forwardRef(({ selectedQuestions, onSubmit, disabled, buttonDi
         });
     };
 
-    // Function to submit data to the database
-    const createDocument = async (data) => {
+    const submitExamResults = async (data) => {
         try {
-            setIsLoading(true); // Start loading
-            const result = await databases.createDocument(
-                database_id,
-                studentMarksTable_id,
-                "unique()",
-                data
-            );
+            const response = await fetch(`${serverUrl}/exam/submit-exam`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const result = await response.json();
+            return result;
         } catch (error) {
-            console.error("Error creating document:", error);
-        } finally {
-            setIsLoading(false); // Stop loading regardless of success or error
+            console.error('Error submitting exam results:', error);
+            throw error;
         }
     };
 
-    /**
-     * Calculating marks.
-     * Normalization to answers (both user-answers and given answer options) before comparison
-     * Removes special characters (all question types) and extra spaces (only text-type).
-     */
     const calculateMarks = (question, userAnswer) => {
         const { type, answer, mark, sub_questions } = question;
         const correctAnswer = Array.isArray(answer) ? answer : [answer];
 
-        // General normalize function for non-text questions
-        const normalizeGeneral = value => value.trim().toLowerCase();
+        const normalizeGeneral = value => {
+            if (typeof value === 'string') {
+                return value.trim().toLowerCase();
+            } else if (typeof value === 'object') {
+                return JSON.stringify(value).toLowerCase();
+            } else if (Array.isArray(value)) {
+                return value.map(val => normalizeGeneral(val));
+            }
+            return value;
+        };
 
-        // Specialized normalize function for text questions
         const normalizeText = value => value
-            .replace(/[\s\.,\-_!@#$%^&*()=+{}[\]\\;:'"<>/?|`~]+/g, '') // Remove special characters
-            .replace(/\s+/g, ' ') // Replace multiple spaces with a single space
+            .replace(/[\s\.,\-_!@#$%^&*()=+{}[\]\\;:'"<>/?|`~]+/g, '')
+            .replace(/\s+/g, ' ')
             .trim()
             .toLowerCase();
 
@@ -135,7 +154,7 @@ const SaveButton = forwardRef(({ selectedQuestions, onSubmit, disabled, buttonDi
                 }
                 break;
             case 'dragAndDrop':
-                maxScore = mark || 1; // Assign the max score to mark if available, otherwise 1
+                maxScore = mark || 1;
                 if (Array.isArray(userAnswer) && Array.isArray(correctAnswer) && userAnswer.length === correctAnswer.length) {
                     let isCorrect = true;
                     for (let i = 0; i < correctAnswer.length; i++) {
@@ -153,7 +172,6 @@ const SaveButton = forwardRef(({ selectedQuestions, onSubmit, disabled, buttonDi
                 break;
         }
 
-        // Calculate marks for subquestions
         if (sub_questions) {
             sub_questions.forEach(subQ => {
                 const subResult = calculateMarks(subQ, subQ.user_answer);
@@ -169,19 +187,12 @@ const SaveButton = forwardRef(({ selectedQuestions, onSubmit, disabled, buttonDi
         const reduxAnswers = reduxState.filter(answer => answer.id === questionId && answer.category === categoryId);
         if (reduxAnswers.length === 0) return null;
 
-        // Handle different types of questions
         switch (questionType) {
             case 'multipleChoice':
             case 'text':
-                // For multiple choice and text questions, return the last user answer
-                return reduxAnswers[reduxAnswers.length - 1].user_answer;
+                return reduxAnswers[reduxAnswers.length - 1].user_answer[0];
             case 'check_box':
-                // For checkbox questions, return the options that are checked
-                const userAnswer = reduxAnswers[reduxAnswers.length - 1].user_answer;
-                const checkedOptions = Object.keys(userAnswer).filter(option => userAnswer[option]);
-                return checkedOptions;
             case 'dragAndDrop':
-                // For drag and drop questions, return the array of dropped items
                 return reduxAnswers[reduxAnswers.length - 1].user_answer;
             default:
                 return null;
@@ -254,11 +265,10 @@ const SaveButton = forwardRef(({ selectedQuestions, onSubmit, disabled, buttonDi
 
         onSubmit();
 
-        // Create a document in Appwrite Collection
         const resultsString = JSON.stringify(formattedAnswers);
 
         const userResultsData = {
-            examID: '',
+            examID: examID,
             studID: studentID,
             marks: totalMarks,
             subjectName: subjectName,
@@ -268,11 +278,12 @@ const SaveButton = forwardRef(({ selectedQuestions, onSubmit, disabled, buttonDi
         };
 
         try {
-            await createDocument(userResultsData);
-            let userFetchedResults = await fetchAndUpdateResults(userInfo.userID);
+            await submitExamResults(userResultsData);
         } catch (e) {
             console.error('Error saving ANSWERS to cloud db');
         }
+
+        await updateResultsData(studentID);
 
         const questionsData = formattedAnswers;
 

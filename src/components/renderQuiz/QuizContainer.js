@@ -8,7 +8,7 @@ import SaveButton from './SaveButton';
 import QuestionCard from './QuestionCard';
 import Timer from './Timer';
 
-const QuizContainer = ({ questionsData, subjectName }) => {
+const QuizContainer = ({ questionsData, subjectName, examID }) => {
     const [selectedQuestions, setSelectedQuestions] = useState([]);
     const [showModal, setShowModal] = useState(false);
     const [showExitModal, setShowExitModal] = useState(false);
@@ -22,8 +22,10 @@ const QuizContainer = ({ questionsData, subjectName }) => {
 
     const saveButtonRef = useRef(null);
 
+    // console.log('Questions Data: ', questionsData)
+
     useEffect(() => {
-        console.log('Questions Data: ', questionsData)
+        // console.log('Questions Data: ', questionsData)
         const fetchAndSetQuestions = async () => {
             setIsLoading(true);
 
@@ -237,6 +239,7 @@ const QuizContainer = ({ questionsData, subjectName }) => {
                         disabled={isSubmitted}
                         style={{ backgroundColor: 'blue', color: 'white', fontSize: '20px' }}
                         subject_Name={subjectName}
+                        examID={examID}
                     />
                 </Modal.Body>
                 <Modal.Footer>
@@ -270,6 +273,7 @@ const QuizContainer = ({ questionsData, subjectName }) => {
                 style={{ display: 'none' }}
                 buttonDisplay={'none'}
                 subject_Name={subjectName}
+                examID={examID}
             />
         </Container>
     );

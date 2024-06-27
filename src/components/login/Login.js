@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faLock } from '@fortawesome/free-solid-svg-icons';
 import { useAuth } from "../../context/AuthContext.js";
 import { fetchAndUpdateResults } from "../../utilities/resultsUtil";
-import { fetchAndProcessStudentData, initiateIndexDB, fetchSetExams, updateSubjectsData, updateClassData } from "../../utilities/fetchStudentData";
+import { fetchAndProcessStudentData, initiateIndexDB, fetchSetExams, updateSubjectsData, updateClassData, updateResultsData } from "../../utilities/fetchStudentData";
 import storageUtil from '../../utilities/storageUtil.js';
 import db from '../../db.js';
 import { clearAllTables } from './utils.js'
@@ -133,6 +133,7 @@ const Login = () => {
             if (userInfo.userType === "student") {
                 //Fetch student(s) results
                 console.log("Fetching student updated results");
+                await updateResultsData(userInfo.userID)
                 await fetchAndUpdateResults(userInfo.userID);
 
             }

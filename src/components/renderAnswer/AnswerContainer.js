@@ -3,37 +3,39 @@ import { Container, Card, ListGroup, Alert } from 'react-bootstrap';
 import AnswerCard from './AnswerCard';
 
 const AnswerContainer = ({ questionsData, subjectName, totalMarks, totalPossibleMarks, attemptDate }) => {
-    let subject_Name = subjectName === "sst_ple" ? "Social Studies" : (subjectName === "math_ple" ? "Mathematics" : (subjectName === "sci_ple" ? "Science" : subjectName));
+    let subject_Name = subjectName;
 
     const [percentageScore, setPercentageScore] = useState('');
 
+    console.log(`Total Score: ${totalMarks}, Possible Score: ${totalPossibleMarks}`);
+
     useEffect(() => {
-        const calculatePercentageScore = () => {
-            console.log('Answers: ', questionsData)
+        const calculatePercentageScore = async () => {
             let totalScore = parseFloat(totalMarks);
             let totalPossibleScore = parseFloat(totalPossibleMarks);
-            // console.log(`Total Score: ${totalScore}, Possible Score: ${totalPossibleScore}`);
 
             if (isNaN(totalScore)) {
-                // console.log('Invalid score values');
+                console.log('Invalid score values');
                 return null;
             }
 
             if (totalPossibleScore === 0 || isNaN(totalPossibleScore)) {
-                // console.log('Total possible score is 0, cannot calculate percentage');
+                console.log('Total possible score is 0, cannot calculate percentage');
                 return totalScore;
             }
 
             let percentage = (totalScore / totalPossibleScore) * 100;
             let roundedPercentage = Math.round(percentage * 10) / 10;
-            // console.log('Percentage calculated: ' + roundedPercentage + '%');
+            console.log('Percentage calculated: ' + roundedPercentage + '%');
             return `${roundedPercentage} %`;
         };
 
-        if (totalMarks && totalPossibleMarks) {
-            setPercentageScore(calculatePercentageScore());
+        if (totalMarks !== null && totalMarks !== undefined && totalPossibleMarks !== null && totalPossibleMarks !== undefined) {
+            calculatePercentageScore().then((result) => {
+                setPercentageScore(result);
+            });
         }
-    }, [totalMarks, totalPossibleMarks]); // Dependency array to re-calculate when marks change
+    }, [totalMarks, totalPossibleMarks]);
 
     return (
         <Container>

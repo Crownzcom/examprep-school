@@ -10,13 +10,13 @@ const Answers = () => {
     const location = useLocation();
     const { userInfo } = useAuth();
     // const userInfo = storageUtil.getItem("userInfo");
-    const isStudent = userInfo.labels.includes("student");
-    const isAdmin = userInfo.labels.includes("admin");
-    const isNextOfKin = userInfo.labels.includes("kin");
+    const isStudent = userInfo.userType === "student";
+    const isAdmin = userInfo.userType === "admin";
+    const isDev = userInfo.userType === "dev"
     const navigate = useNavigate();
     const { questionsData, subjectName, totalMarks, attemptDate, totalPossibleMarks } = location.state || { questionsData: [], subjectName: '', totalMarks: 0, totalPossibleMarks: null, attemptDate: '' };
 
-    // console.log(`subjectName: ${subjectName}\ntotalMarks: ${totalMarks}\ntotalPossibleMarks: ${totalPossibleMarks}\nattemptDate: ${attemptDate}`);
+    // console.log(`Received data `, location.state);
 
     return (
         <Container fluid style={{}}>

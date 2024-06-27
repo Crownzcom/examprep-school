@@ -16,7 +16,7 @@ import storageUtil from "./storageUtil"; // Import storageUtil
 
 /*Helper functions*/
 
-const getDocs = async (colID, query = []) => {
+export const getDocs = async (colID, query = []) => {
   try {
     const response = await databases.listDocuments(database_id, colID, query)
 
@@ -107,6 +107,67 @@ export const updateSubjectsData = async () => {
   } catch (error) {
     console.error('Error updating subjects index db table:', error);
     throw new Error('Error updating subjects index db table:', error);
+  }
+};
+
+//Updates exams done in index db
+export const updateResultsData = async (studID) => {
+  try {
+
+    // Fetch Results
+    const results = await getDocs(studentMarksTable_id, [Query.equal("studID", [studID]), Query.limit(500)])
+    console.log('Results found: ', results)
+
+    results.forEach((obj) => {
+      // obj.questions = obj.questions.map((q) => JSON.parse(q));
+      delete obj.results;
+      delete obj.$createdAt;
+      delete obj.$updatedAt;
+      delete obj.$permissions;
+      delete obj.$databaseId;
+      delete obj.$collectionId;
+    });
+
+    if (!db.isOpen()) {
+      await db.open();
+    }
+
+    await db.transaction('rw', db.results, async () => {
+      // Clear the existing entries in the results table
+      await db.results.clear();
+
+      console.log('Saving to results IndexDB ... ');
+      // Bulk put the new data after clearing the table
+      const savingToIndexDB = await db.results.bulkPut(results.map(result => ({
+        // ...result,
+        examID: result.examID,
+        resultsID: result.$id,
+        subjectName: result.subjectName,
+        marks: result.marks,
+        finalPossibleMarks: result.finalPossibleMarks,
+        durationMINS: result.durationMINS != undefined || result.durationMINS != null ? result.durationMINS : null,
+        dateTime: new Date(result.dateTime).toLocaleString("en-US", {
+          timeZone: "Africa/Nairobi",
+          hour12: false,
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+        }),
+      })));
+
+      console.log('IndexDB response: ', savingToIndexDB);
+
+      //only reload if the current open window is '/all-results'
+      if (window.location.pathname === '/all-results') {
+        window.location.reload();
+      }
+    });
+  } catch (error) {
+    console.error('Error updating results index db table:', error);
+    throw new Error('Error updating results index db table:', error);
   }
 };
 

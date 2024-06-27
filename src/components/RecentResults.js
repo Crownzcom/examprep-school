@@ -30,7 +30,7 @@ const RecentResults = ({ results, onViewResults }) => {
     let percentage = (totalScore / totalPossibleScore) * 100;
     let roundedPercentage = Math.round(percentage * 10) / 10;
     // console.log('Percentage calculated: ' + roundedPercentage + '%');
-    return `${roundedPercentage} %`;
+    return `${roundedPercentage}`;
   };
 
   return (
@@ -42,23 +42,23 @@ const RecentResults = ({ results, onViewResults }) => {
             <tr>
               <th>Subject</th>
               <th>Date</th>
-              <th>Score</th>
+              <th>Score (%)</th>
               <th>Action</th>
             </tr>
           </thead>
           <tbody>
             {mostRecentAttempts.map((attempt, idx) => (
               <tr key={idx}>
-                <td>{attempt.subject === "sst_ple" ? "Social Studies" : (attempt.subject === "math_ple" ? "Mathematics" : (attempt.subject === "sci_ple" ? "Science" : attempt.subject))}</td>
+                <td>{attempt.subject}</td>
                 <td>{attempt.dateTime}</td>
-                {/* <td>{attempt.score}</td> */}
-                <td>{calculatePercentageScore(attempt.score, attempt.totalPossibleScore)}</td>
+                <td>{calculatePercentageScore(attempt.score, attempt.totalPossibleMarks)}</td>
                 <td>
-                  {attempt.resultDetails ? (
+                  {attempt.resultsID ? (
                     <Button
                       className='btn-cancel'
                       variant="dark"
-                      onClick={() => onViewResults(attempt.resultDetails, attempt.subject, attempt.score, attempt.totalPossibleScore, attempt.dateTime)}
+                      // resultsID, subjectName, totalMarks, attemptDate, totalPossibleMarks
+                      onClick={() => onViewResults(attempt.resultsID, attempt.subject, attempt.score, attempt.dateTime, attempt.totalPossibleMarks)}
                     >
                       <FontAwesomeIcon icon={faEye} className="me-2" />
                       Exam Results

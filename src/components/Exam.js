@@ -52,7 +52,7 @@ function Exam({ examID }) {
         let questionData = await getSelectedExam(examID);
 
         setSubject(questionData.subjectName);
-        console.log("Subject: ", questionData.subjectName);
+        // console.log("Subject: ", questionData.subjectName);
 
         if (!questionData.examQuestions || JSON.parse(questionData.examQuestions).length < 1) {
           navigate(-1);
@@ -86,7 +86,7 @@ function Exam({ examID }) {
   };
 
   const renderQuizContent = () => {
-    return <QuizContainer questionsData={data} subjectName={subject} />;
+    return <QuizContainer questionsData={data} subjectName={subject} examID={examID} />;
   };
 
   const subjectInstructions = () => {
