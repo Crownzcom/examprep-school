@@ -33,27 +33,9 @@ const Profile = () => {
   const sessionData = storageUtil.getItem("sessionInfo");
   console.log('Session Data: ', sessionData);
   const navigate = useNavigate();
-  const [linkedStudents, setLinkedStudents] = useState([]);
   const [activeTab, setActiveTab] = useState('personalDetails');
-
-  useEffect(() => {
-    const studentData = storageUtil.getItem("studentData");
-    if (studentData) {
-      setLinkedStudents(studentData);
-    }
-  }, []);
-
-  //Hook to manage modal visibility
-  const [showModal, setShowModal] = useState(false);
-
   //Check user type
   const isStudent = userInfo.userType === "student";
-
-  //Pagination purposes
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5; // Adjust as needed
-
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   // Handlers for Tab Navigation
   const handleSelectTab = (tab) => {
@@ -153,7 +135,7 @@ const Profile = () => {
       <div className="text-center">
         <h1 className="display-4">Hello, {userInfo.firstName}!</h1>
         <p className="lead">Welcome to your Profile Dashboard</p>
-        <div className="profile-hero-buttons mt-4">
+        {/* <div className="profile-hero-buttons mt-4">
           <Button
             variant="outline-light"
             className="me-2"
@@ -161,7 +143,7 @@ const Profile = () => {
           >
             <FontAwesomeIcon icon={faEdit} /> Edit Profile
           </Button>
-        </div>
+        </div> */}
       </div>
     </HeroHeader>
   );

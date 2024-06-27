@@ -185,8 +185,11 @@ function SelectExam() {
             </Button>
 
             <Card className="my-3">
+              <Card.Header className="text-center mb-4">
+                <h4>Active and Open Exams</h4>
+              </Card.Header>
               <Card.Body>
-                <h4 className="text-center mb-4">Active and Open Exams</h4>
+
                 {
                   activeAndOpen.length > 0 ?
                     (
@@ -207,9 +210,10 @@ function SelectExam() {
             </Card>
 
             <Card className="my-3">
+              <Card.Header className="text-center mb-4">
+                <h4>Future Exams</h4>
+              </Card.Header>
               <Card.Body>
-
-                <h4 className="text-center mb-4">Future Exams</h4>
                 {notYetActive.length > 0 ?
                   (
                     <>
