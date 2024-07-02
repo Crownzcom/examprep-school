@@ -63,7 +63,7 @@ const QuestionCard = ({ questionIndex, question, isEitherOr, categoryId, setUser
     );
 
     const renderQuestion = (currentQuestion, disabled) => {
-        currentQuestion.sub_questions && console.log('subQ', currentQuestion.sub_questions);
+        // currentQuestion.sub_questions && console.log('subQ', currentQuestion.sub_questions);
         return <>
             {renderQuestionText(currentQuestion.question, currentQuestion.image, currentQuestion.type)}
             <AnswerInput
@@ -75,7 +75,7 @@ const QuestionCard = ({ questionIndex, question, isEitherOr, categoryId, setUser
             />
             {currentQuestion.sub_questions && currentQuestion.sub_questions.map((subQ, index) => (
                 <AnswerInput
-                    key={subQ.id ? subQ.id : `${currentQuestion.id}_sub_${index}`}
+                    key={subQ.id != null || subQ.id != undefined ? subQ.id : `${currentQuestion.id}_sub_${index}`}
                     question={subQ}
                     onChange={(answer) => handleAnswerChange((subQ.id ? subQ.id : currentQuestion.id), answer, subQ.type, (subQ.id ? null : index))} //if subquestion has id assigned, pass it, or else pass the main question id and the subquestion index itself
                     getUserAnswer={() => getUserAnswer(subQ.id ? subQ.id : `${currentQuestion.id}_sub_${index}`)}

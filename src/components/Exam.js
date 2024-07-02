@@ -3,81 +3,66 @@ import QuizContainer from "./renderQuiz/QuizContainer";
 import { Modal, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
-import {
-  databases,
-  database_id,
-  examsTable_id,
-  Query,
-} from "../appwriteConfig.js"; // Data from appwrite database
-import { getSelectedExam } from "./renderQuiz/utils.js"
+import { getSelectedExam, checkExamIfDone } from "./renderQuiz/utils.js";
 import { useAuth } from "../context/AuthContext";
 
-/**
- * Represents an Exam component.
- * @param {Object} props - The component props.
- * @param {string} props.examID - The ID of the exam.
- * @returns {JSX.Element} The Exam component.
- */
 function Exam({ examID }) {
   const [showInstructionsModal, setShowInstructionsModal] = useState(true);
-  const [showUnavailableModal, setShowUnavailableModal] = useState(true);
+  const [showUnavailableModal, setShowUnavailableModal] = useState(false);
+  const [showExamDoneModal, setShowExamDoneModal] = useState(false); // New state for exam done modal
+  const [examDone, setExamDone] = useState(false);
   const [data, setData] = useState(null); // Variable to store the fetched questions data
   const [subject, setSubject] = useState("");
 
   const navigate = useNavigate();
 
-  // Get Exam by ID
-  // const getSelectedExam = async (examID) => {
-  //   try {
-  //     // Query the 'exams' table for exams with the specified examID
-  //     const examInformation = await databases.listDocuments(database_id, examsTable_id, [
-  //       Query.equal("examID", examID),
-  //     ]);
-
-  //     console.log("Exams retrieved: ", examInformation.documents);
-
-  //     // Return the selected exam data, or an empty array if no record is found
-  //     return examInformation.documents.length > 0 ? examInformation.documents[0] : {};
-
-  //   } catch (error) {
-  //     console.error("Error retrieving exam:", error);
-  //     throw new Error("Error retrieving exam data"); // Handle errors appropriately
-  //   }
-  // };
-
+  // Check if exam was done
   useEffect(() => {
-    // Fetch data from your cloud Appwrite database
-    const fetchData = async () => {
-      try {
-        let questionData = await getSelectedExam(examID);
-
-        setSubject(questionData.subjectName);
-        // console.log("Subject: ", questionData.subjectName);
-
-        if (!questionData.examQuestions || JSON.parse(questionData.examQuestions).length < 1) {
-          navigate(-1);
-          console.log("no exam found");
-          return;
-        }
-
-        setData(JSON.parse(questionData.examQuestions));
-      } catch (error) {
-        console.error("Error fetching data:", error);
+    const checkExam = async () => {
+      const isDone = await checkExamIfDone(examID);
+      console.log("Exam done:", isDone); // Log the result to ensure it is correct
+      if (isDone) {
+        setExamDone(true);
+        setShowInstructionsModal(false);
+        setShowExamDoneModal(true);
       }
     };
 
-    fetchData(); // Call the fetchData function to fetch the data
+    checkExam();
+  }, [examID]);
+
+  useEffect(() => {
+    if (!examDone) {
+      const fetchData = async () => {
+        try {
+          let questionData = await getSelectedExam(examID);
+
+          setSubject(questionData.subjectName);
+          if (!questionData.examQuestions || JSON.parse(questionData.examQuestions).length < 1) {
+            navigate(-1);
+            console.log("no exam found");
+            return;
+          }
+
+          setData(JSON.parse(questionData.examQuestions));
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
+      };
+
+      fetchData(); // Call the fetchData function to fetch the data
+    }
 
     // Cleanup function
     return () => { };
-  }, [examID, navigate]); // Dependency array ensures the code runs only once when examID changes
+  }, [examID, navigate, examDone]); // Dependency array ensures the code runs only once when examID changes
 
   const handleProceed = () => {
-    if (subject === "social_studies" || subject === "mathematics" || subject === "english_language" || subject === "science") {
+    if (["social_studies", "mathematics", "english_language", "science"].includes(subject)) {
       setShowInstructionsModal(false);
     } else {
       setShowInstructionsModal(false);
-      setShowUnavailableModal(false); // Set the subject validity to false
+      setShowUnavailableModal(true); // Set the subject validity to false
     }
   };
 
@@ -99,8 +84,17 @@ function Exam({ examID }) {
     );
   };
 
+  const handleCloseExamDoneModal = () => {
+    setShowExamDoneModal(false);
+    navigate('/exam-page');
+  };
+
   return (
     <>
+      {/* Render the exam if all the consitions are fullfiled */}
+      {!examDone && !showInstructionsModal && !showUnavailableModal && renderQuizContent()}
+
+      {/* Modal to display the exam instructions */}
       <Modal show={showInstructionsModal} onHide={() => { }} centered>
         <Modal.Header>
           <Modal.Title>Exam Instructions</Modal.Title>
@@ -130,10 +124,9 @@ function Exam({ examID }) {
         </Modal.Footer>
       </Modal>
 
-      {!showInstructionsModal && showUnavailableModal && renderQuizContent()}
-
-      {!showUnavailableModal && (
-        <Modal show={true} onHide={() => { }} centered styles={{ width: "40%", height: "40%" }}>
+      {/* Modal to show exam is unavailable */}
+      {showUnavailableModal && (
+        <Modal show={true} onHide={() => { }} centered>
           <Modal.Header>
             <Modal.Title>Exam Unavailable</Modal.Title>
           </Modal.Header>
@@ -147,6 +140,21 @@ function Exam({ examID }) {
           </Modal.Footer>
         </Modal>
       )}
+
+      {/* Exam Done Modal */}
+      <Modal show={showExamDoneModal} onHide={handleCloseExamDoneModal} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Exam Already Done</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>You have already completed this exam. You cannot retake it.</p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="primary" onClick={handleCloseExamDoneModal}>
+            OK
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </>
   );
 }

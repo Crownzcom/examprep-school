@@ -11,10 +11,11 @@ import { showToast } from "./utilities/toastUtil.js";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import AppContent from "./components/navbar/AppContent";
-import Footer from "./components/Footer";
+// import Footer from "./components/Footer";
 import Initiate from "./components/initiate/Initiate.js";
 import Login from "./components/login/Login";
-import SignUp from "./components/Signup";
+import Signup from "./components/createAccount/Signup.js";
+import FileUpload from "./components/createAccount/FileUpload.js";
 import ForgetPassword from "./components/ForgetPassword";
 import Testing from "./components/Testing";
 import Home from "./components/Home";
@@ -90,7 +91,8 @@ function App() {
               <Route path="/schedule-exam" element={<PrivateRoute><ScheduleExam /></PrivateRoute>} />
               <Route path="/initiate" element={<Initiate />} />
               <Route path="/login" element={<Login />} />
-              <Route path="/sign-up" element={<SignUp />} />
+              <Route path="/sign-up" element={<PrivateRoute><Signup /></PrivateRoute>} />
+              <Route path="/sign-up/file-upload" element={<PrivateRoute><FileUpload /></PrivateRoute>} />
               <Route path="/forget-password" element={<ForgetPassword />} />
               <Route path="/password-reset" element={<PasswordReset />} />
               <Route path="*" element={<NotFoundPage />} />

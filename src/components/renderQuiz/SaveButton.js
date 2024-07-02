@@ -39,7 +39,7 @@ const SaveButton = forwardRef(({ selectedQuestions, onSubmit, disabled, buttonDi
     const navigate = useNavigate();
 
     const results = useSelector(state => state.answers);
-    console.log('redux results: ', results);
+    // console.log('redux results: ', results);
 
     const transformAndRemoveDuplicates = (answers) => {
         const transformedAnswers = answers.map(answer => {
@@ -66,7 +66,7 @@ const SaveButton = forwardRef(({ selectedQuestions, onSubmit, disabled, buttonDi
     };
 
     const reduxState = transformAndRemoveDuplicates(results);
-    console.log('transformed results:', results)
+    // console.log('transformed results:', results)
 
     const assignSubQuestionIds = async (questions) => {
         questions.forEach(question => {

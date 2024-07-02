@@ -23,7 +23,7 @@ export const getDocs = async (colID, query = []) => {
     return response.documents
 
   } catch (err) {
-    console.log('Failed to retrieve docs for: ', colID);
+    console.error('Failed to retrieve docs for: ', colID);
     throw new Error(`Failed to retrieve docs for: ${colID} ... ${err}`);
   }
 }
@@ -39,7 +39,7 @@ const updateExamData = async (examData) => {
       // Clear the existing entries in the exams table
       await db.exams.clear();
 
-      console.log('Saving to IndexDB ... ');
+      // console.log('Saving to IndexDB ... ');
       // Bulk put the new data after clearing the table
       const savingToIndexDB = await db.exams.bulkPut(examData.map(exam => ({
         ...exam,
@@ -70,7 +70,7 @@ const updateExamData = async (examData) => {
         })
       })));
 
-      console.log('IndexDB response: ', savingToIndexDB);
+      // console.log('IndexDB response: ', savingToIndexDB);
     });
   } catch (error) {
     console.error('Error updating exams:', error);
@@ -84,7 +84,7 @@ export const updateSubjectsData = async () => {
 
     // Fetch Subjects
     const subjects = await getDocs(subjectsTable_id, [])
-    console.log('Subjects found: ', subjects)
+    // console.log('Subjects found: ', subjects)
 
     if (!db.isOpen()) {
       await db.open();
@@ -94,7 +94,7 @@ export const updateSubjectsData = async () => {
       // Clear the existing entries in the exams table
       await db.subjects.clear();
 
-      console.log('Saving to Subjects IndexDB ... ');
+      // console.log('Saving to Subjects IndexDB ... ');
       // Bulk put the new data after clearing the table
       const savingToIndexDB = await db.subjects.bulkPut(subjects.map(subject => ({
         ...subject,
@@ -102,7 +102,7 @@ export const updateSubjectsData = async () => {
         examTableId: subject.examTableId,
       })));
 
-      console.log('IndexDB response: ', savingToIndexDB);
+      // console.log('IndexDB response: ', savingToIndexDB);
     });
   } catch (error) {
     console.error('Error updating subjects index db table:', error);
@@ -116,7 +116,7 @@ export const updateResultsData = async (studID) => {
 
     // Fetch Results
     const results = await getDocs(studentMarksTable_id, [Query.equal("studID", [studID]), Query.limit(500)])
-    console.log('Results found: ', results)
+    // console.log('Results found: ', results)
 
     results.forEach((obj) => {
       // obj.questions = obj.questions.map((q) => JSON.parse(q));
@@ -136,7 +136,7 @@ export const updateResultsData = async (studID) => {
       // Clear the existing entries in the results table
       await db.results.clear();
 
-      console.log('Saving to results IndexDB ... ');
+      // console.log('Saving to results IndexDB ... ');
       // Bulk put the new data after clearing the table
       const savingToIndexDB = await db.results.bulkPut(results.map(result => ({
         // ...result,
@@ -158,7 +158,7 @@ export const updateResultsData = async (studID) => {
         }),
       })));
 
-      console.log('IndexDB response: ', savingToIndexDB);
+      // console.log('IndexDB response: ', savingToIndexDB);
 
       //only reload if the current open window is '/all-results'
       if (window.location.pathname === '/all-results') {
@@ -186,7 +186,7 @@ export const updateClassData = async () => {
       // Clear the existing entries in the exams table
       await db.classes.clear();
 
-      console.log('Saving to Subjects IndexDB ... ');
+      // console.log('Saving to Subjects IndexDB ... ');
       // Bulk put the new data after clearing the table
       const savingToIndexDB = await db.classes.bulkPut(classes.map(class_ => ({
         ...class_,
@@ -194,7 +194,7 @@ export const updateClassData = async () => {
         streams: JSON.stringify(class_.streams),
       })));
 
-      console.log('IndexDB response: ', savingToIndexDB);
+      // console.log('IndexDB response: ', savingToIndexDB);
     });
   } catch (error) {
     console.error('Error updating classes index db table:', error);
@@ -220,13 +220,13 @@ export const fetchStudents = async (refresh = false) => {
         throw new Error(data.message || 'Error fetching students data from the database');
       }
     } else {
-      console.log('Fetching students data from local file.');
+      // console.log('Fetching students data from local file.');
       const response = await fetch(`${serverUrl}/students/fetch-students`);
       const data = await response.json();
       if (response.ok) {
-        console.log('Students Data fetched successfully: ', data);
+        // console.log('Students Data fetched successfully: ', data);
         await updateStudentsLocalDatabase(data);
-        console.log('Students Data fetched from file and saved to local database.');
+        // console.log('Students Data fetched from file and saved to local database.');
         return data;
       } else {
         console.warn('Failed to fetch students data from local file, trying the database refresh.');
@@ -246,7 +246,7 @@ async function updateStudentsLocalDatabase(studentData) {
       // Clear the existing entries in the students table
       await db.students.clear();
 
-      console.log('Saving to IndexDB ... ');
+      // console.log('Saving to IndexDB ... ');
       // Bulk put the new data after clearing the table
       const savingToIndexDB = await db.students.bulkPut(studentData.map(student => ({
         ...student,
@@ -300,17 +300,17 @@ export const fetchSetExams = async (userInfo) => {
     let examData = []
     if (userInfo.userType === 'student') {
       //fetch exams
-      console.log('fetch exam data for: class: ', userInfo.studClass, ' stream: ', userInfo.stream)
+      // console.log('fetch exam data for: class: ', userInfo.studClass, ' stream: ', userInfo.stream)
       examData = await getDocs(examsTable_id, [Query.and([
         Query.equal('classID', userInfo.studClass),
         Query.contains('stream', [userInfo.stream])
       ])])
-      console.log('Stud exam found: ', examData)
+      // console.log('Stud exam found: ', examData)
     }
     else if (userInfo.userType === 'admin') {
       //fetch exams
       examData = await getDocs(examsTable_id, [])
-      console.log('admin exam found: ', examData)
+      // console.log('admin exam found: ', examData)
     }
     else {
       throw new Error('Invalid user type or user type is not provided or supported: ', userInfo.userType);
@@ -345,9 +345,9 @@ export const fetchAndProcessStudentData = async () => {
         return response.json();
       })
       .then(data => {
-        console.log(data); // This logs the data retrieved from the server
+        // console.log(data); // This logs the data retrieved from the server
 
-        console.log('Processed Data: ', data.data)
+        // console.log('Processed Data: ', data.data)
 
         // Step 3: Save the processed data to local storage using storageUtil
         storageUtil.setItem("studentData", data.data);
@@ -493,14 +493,14 @@ export const initiateIndexDB = async (userInfo) => {
   if (userInfo.userType === "admin" || userInfo.userType === "staff") {
     // console.log('Fetching student data');
     await fetchStudents(true).then(data => {
-      console.log('Students data Fetch successfully');
+      // console.log('Students data Fetch successfully');
     }).catch(error => {
       console.error('Failed to fetch students');
     });
   }
   else if (userInfo.userType === 'student') {
     await fetchSetExams(userInfo.studClass, userInfo.stream).then(data => {
-      console.log('Student exam Fetch successfully');
+      // console.log('Student exam Fetch successfully');
     }).catch(error => {
       console.error('Failed to fetch student exams');
     });

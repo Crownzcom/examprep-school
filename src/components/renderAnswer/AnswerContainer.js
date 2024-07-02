@@ -7,7 +7,7 @@ const AnswerContainer = ({ questionsData, subjectName, totalMarks, totalPossible
 
     const [percentageScore, setPercentageScore] = useState('');
 
-    console.log(`Total Score: ${totalMarks}, Possible Score: ${totalPossibleMarks}`);
+    // console.log(`Total Score: ${totalMarks}, Possible Score: ${totalPossibleMarks}`);
 
     useEffect(() => {
         const calculatePercentageScore = async () => {
@@ -15,18 +15,18 @@ const AnswerContainer = ({ questionsData, subjectName, totalMarks, totalPossible
             let totalPossibleScore = parseFloat(totalPossibleMarks);
 
             if (isNaN(totalScore)) {
-                console.log('Invalid score values');
+                // console.log('Invalid score values');
                 return null;
             }
 
             if (totalPossibleScore === 0 || isNaN(totalPossibleScore)) {
-                console.log('Total possible score is 0, cannot calculate percentage');
+                // console.log('Total possible score is 0, cannot calculate percentage');
                 return totalScore;
             }
 
             let percentage = (totalScore / totalPossibleScore) * 100;
             let roundedPercentage = Math.round(percentage * 10) / 10;
-            console.log('Percentage calculated: ' + roundedPercentage + '%');
+            // console.log('Percentage calculated: ' + roundedPercentage + '%');
             return `${roundedPercentage} %`;
         };
 

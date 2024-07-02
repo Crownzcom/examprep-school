@@ -1,0 +1,60 @@
+.signup-container {
+  margin-top: 20px;
+}
+
+.file-upload-card {
+  border-radius: 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.file-upload-card .card-header {
+  background-color: #007bff;
+  color: white;
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+}
+
+.file-upload-card .card-body {
+  padding: 30px;
+}
+
+.file-upload-card .form-control {
+  margin-bottom: 20px;
+}
+
+.file-upload-card .btn-info {
+  background-color: #17a2b8;
+  border: none;
+  font-size: 14px;
+  padding: 5px 10px;
+  margin-left: 10px;
+  border-radius: 5px;
+}
+
+.file-upload-card .btn-info:hover {
+  background-color: #138496;
+}
+
+.file-upload-card .btn-success {
+  background-color: #28a745;
+  border: none;
+  font-size: 16px;
+  padding: 10px 20px;
+  border-radius: 5px;
+}
+
+.file-upload-card .btn-success:hover {
+  background-color: #218838;
+}
+
+.file-upload-card .btn-primary {
+  background-color: #007bff;
+  border: none;
+  font-size: 16px;
+  padding: 10px 20px;
+  border-radius: 5px;
+}
+
+.file-upload-card .btn-primary:hover {
+  background-color: #0056b3;
+}

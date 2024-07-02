@@ -20,6 +20,7 @@ function Home() {
   const isAdmin = userInfo.userType === "admin";
   const isDev = userInfo.userType === "dev"
 
+  /*======== TESTING ONLY =================================*/
   //FETCH EXAMS AND SAVE IN INDEX DB
   useEffect(() => {
     const fetchExams = async () => {
@@ -55,6 +56,12 @@ function Home() {
       }
     }
   }
+
+  const testFunc3 = async () => {
+    //navigate to signup page
+    navigate('/sign-up')
+  }
+  /*==============================================================*/
 
   const renderHeroHeader = () => (
     <HeroHeader>
@@ -102,6 +109,7 @@ function Home() {
                       <Card.Header as="h5">Additional Feature</Card.Header>
                       <Card.Body>
                         <Card.Text>More developer features here.</Card.Text>
+                        <Button variant="outline-secondary" onClick={testFunc3}>Sign-Up Users</Button>
                         <Button variant="outline-secondary" onClick={testFunc2}>Activate Feature</Button>
                       </Card.Body>
                     </Card>

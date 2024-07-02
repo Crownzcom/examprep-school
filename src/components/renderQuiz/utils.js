@@ -2,25 +2,15 @@
 import {
     databases,
     database_id,
-    updatedAttemptedQtnsTable_id,
     examsTable_id,
     Query,
 } from "../../appwriteConfig.js"; //Data from appwrite database
-import {
-    databasesQ,
-    database_idQ,
-    sstTablePLE_id,
-    mathPLE_id,
-    engTbalePLE_id,
-    sciTablePLE_id,
-    QueryQ,
-} from "./examsAppwriteConfig"; //Data from appwrite database
 import { serverUrl } from '../../config.js';
 import db from '../../db';  // Import your Dexie database
 
 /**
  * Retrieve a random exam for a given subject from the database
- * @param {string} examID - The name of the subject
+ * @param {string} examID - The id of the exam
  * @returns {Promise<object | string>} - The exam data or a message if not found
  */
 export const getSelectedExam = async (examID) => {
@@ -41,8 +31,20 @@ export const getSelectedExam = async (examID) => {
     }
 };
 
-//TODO: SET STUDENT AS HAS DONE EXAM AT THE END OF THE EXAM
-
+/**
+ * Check if an exam is done by a student.
+ * @param {string} examID - The ID of the exam to check.
+ * @returns {Promise<boolean>} - Returns a promise that resolves to true if the exam is done, otherwise false.
+ */
+export const checkExamIfDone = async (examID) => {
+    try {
+        const results = await db.results.where('examID').equals(examID).toArray();
+        return results.length > 0;
+    } catch (error) {
+        console.error("Error checking if exam is done:", error);
+        return false;
+    }
+};
 
 export const isImageUrl = (url) => {
     return (/\.(gif|jpe?g|tiff?|png|webp|bmp)$/i).test(url);
