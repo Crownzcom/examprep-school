@@ -21,12 +21,11 @@ import {
 import { useAuth } from "../context/AuthContext.js"
 import storageUtil from "../utilities/storageUtil";
 import HeroHeader from "./HeroHeader";
-
 import "./Home.css";
 
 const Profile = () => {
   //Fetch sessionInfo from localStorage
-  console.log('Localstorage data: ', (storageUtil.getItem("userInfo")));
+  // console.log('Localstorage data: ', (storageUtil.getItem("userInfo")));
   const { userInfo, sessionInfo } = useAuth();
   console.log(userInfo);
 
@@ -66,7 +65,7 @@ const Profile = () => {
           }
 
           {
-            userInfo.phone != undefined ? userInfo.phone && (
+            userInfo.phone !== undefined ? userInfo.phone && (
               <>
                 <li className="list-group-item">
                   <i className="bi bi-geo-alt me-2"></i>
@@ -129,7 +128,6 @@ const Profile = () => {
 
 
   // Hero Header
-
   const renderHeroHeader = () => (
     <HeroHeader>
       <div className="text-center">

@@ -59,7 +59,7 @@ function Home() {
 
   const testFunc3 = async () => {
     //navigate to signup page
-    navigate('/sign-up')
+    navigate('/create-account')
   }
   /*==============================================================*/
 

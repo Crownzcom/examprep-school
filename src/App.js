@@ -14,8 +14,7 @@ import AppContent from "./components/navbar/AppContent";
 // import Footer from "./components/Footer";
 import Initiate from "./components/initiate/Initiate.js";
 import Login from "./components/login/Login";
-import Signup from "./components/createAccount/Signup.js";
-import FileUpload from "./components/createAccount/FileUpload.js";
+import CreateAccount from "./components/createAccount/CreateAccount.js";
 import ForgetPassword from "./components/ForgetPassword";
 import Testing from "./components/Testing";
 import Home from "./components/Home";
@@ -91,8 +90,7 @@ function App() {
               <Route path="/schedule-exam" element={<PrivateRoute><ScheduleExam /></PrivateRoute>} />
               <Route path="/initiate" element={<Initiate />} />
               <Route path="/login" element={<Login />} />
-              <Route path="/sign-up" element={<PrivateRoute><Signup /></PrivateRoute>} />
-              <Route path="/sign-up/file-upload" element={<PrivateRoute><FileUpload /></PrivateRoute>} />
+              <Route path="/create-account" element={<PrivateRoute><CreateAccount /></PrivateRoute>} />
               <Route path="/forget-password" element={<ForgetPassword />} />
               <Route path="/password-reset" element={<PasswordReset />} />
               <Route path="*" element={<NotFoundPage />} />

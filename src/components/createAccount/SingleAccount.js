@@ -4,13 +4,13 @@ import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import { Form, Button, Container, Row, Col, Alert, Card } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faUserPlus, faCheck, faDownload, faUpload, faUserGraduate } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faUserPlus, faCheck, faDownload, faUserGraduate } from '@fortawesome/free-solid-svg-icons';
 import db from '../../db';
-import './Signup.css';
+import './SingleAccount.css';
 
 const url = 'http://localhost:3001/create-account/create-users';
 
-const Signup = () => {
+const SingleAccount = () => {
   const initializeFormData = (userType) => ({
     firstName: '',
     lastName: '',
@@ -221,9 +221,6 @@ const Signup = () => {
                   <FontAwesomeIcon icon={faDownload} /> Download File
                 </Button>
               )}
-              <Link to="/sign-up/file-upload" className="btn btn-secondary w-100 mt-3">
-                <FontAwesomeIcon icon={faUpload} /> Click to Upload File
-              </Link>
             </Card.Body>
           </Card>
         </Col>
@@ -232,4 +229,4 @@ const Signup = () => {
   );
 };
 
-export default Signup;
+export default SingleAccount;

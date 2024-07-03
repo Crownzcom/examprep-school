@@ -8,11 +8,11 @@ import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import db from '../../db';
-import './FileUpload.css';
+import './BatchAccount.css';
 
 const url = 'http://localhost:3001/create-account/create-users';
 
-const FileUpload = () => {
+const BatchAccount = () => {
   const [users, setUsers] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -125,8 +125,18 @@ const FileUpload = () => {
 
   const generateTemplate = (type) => {
     const templateData = [expectedHeaders];
-    const blob = new Blob([type === 'csv' ? Papa.unparse(templateData) : XLSX.write(XLSX.utils.book_new({ Sheet1: XLSX.utils.aoa_to_sheet(templateData) }), { bookType: 'xlsx', type: 'array' })], { type: 'application/octet-stream' });
-    saveAs(blob, `user_template.${type}`);
+    if (type === 'csv') {
+      const csvContent = Papa.unparse(templateData);
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      saveAs(blob, 'user_template.csv');
+    } else {
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.aoa_to_sheet(templateData);
+      XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+      const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+      const blob = new Blob([wbout], { type: 'application/octet-stream' });
+      saveAs(blob, 'user_template.xlsx');
+    }
   };
 
   const uploadUsers = async (formattedUsers) => {
@@ -283,4 +293,4 @@ const FileUpload = () => {
   );
 };
 
-export default FileUpload;
+export default BatchAccount;
