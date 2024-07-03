@@ -90,8 +90,7 @@ function App() {
               <Route path="/schedule-exam" element={<PrivateRoute><ScheduleExam /></PrivateRoute>} />
               <Route path="/initiate" element={<Initiate />} />
               <Route path="/login" element={<Login />} />
-              {/* <Route path="/create-account" element={<PrivateRoute><CreateAccount /></PrivateRoute>} /> */}
-              <Route path="/create-account" element={<CreateAccount />} />
+              <Route path="/create-account" element={<PrivateRoute><CreateAccount /></PrivateRoute>} />
               <Route path="/forget-password" element={<ForgetPassword />} />
               <Route path="/password-reset" element={<PasswordReset />} />
               <Route path="*" element={<NotFoundPage />} />
