@@ -11,11 +11,7 @@ import {
 } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faUsers,
   faSchool,
-  faUserCircle,
-  faEdit,
-  faPlusCircle,
   faInfo
 } from "@fortawesome/free-solid-svg-icons";
 import { useAuth } from "../context/AuthContext.js"
@@ -26,7 +22,7 @@ import "./Home.css";
 const Profile = () => {
   //Fetch sessionInfo from localStorage
   // console.log('Localstorage data: ', (storageUtil.getItem("userInfo")));
-  const { userInfo, sessionInfo } = useAuth();
+  const { userInfo, sessionInfo, schoolInfo } = useAuth();
   console.log(userInfo);
 
   const sessionData = storageUtil.getItem("sessionInfo");
@@ -87,6 +83,41 @@ const Profile = () => {
               )
             )
           }
+
+          {/* Additional student-specific content */}
+        </ul>
+      </Card.Body>
+    </Card>
+  )
+
+  const renderSchoolDetails = () => (
+    <Card className="shadow-sm mb-4 profile-card">
+      <Card.Header>
+        <FontAwesomeIcon icon={faInfo} className="me-2" />
+        School Information
+      </Card.Header>
+      <Card.Body>
+        <ul className="list-group list-group-flush">
+          <li className="list-group-item">
+            <i className="bi me-2"></i>
+            <strong>Name: </strong> {schoolInfo.name}
+          </li>
+          <li className="list-group-item">
+            <i className="bi bi-building me-2"></i>
+            <strong>ID No.:</strong> {schoolInfo.schoolID}
+          </li>
+          <li className="list-group-item">
+            <i className="bi bi-building me-2"></i>
+            <strong>Address:</strong> {schoolInfo.address}
+          </li>
+          <li className="list-group-item">
+            <i className="bi bi-building me-2"></i>
+            <strong>Email:</strong> {schoolInfo.email} | {schoolInfo.email2 ? schoolInfo.email2 : ''}
+          </li>
+          <li className="list-group-item">
+            <i className="bi bi-building me-2"></i>
+            <strong>Phone:</strong> {schoolInfo.phone} | {schoolInfo.phone2 ? schoolInfo.phone2 : ''}
+          </li>
 
           {/* Additional student-specific content */}
         </ul>
@@ -161,6 +192,9 @@ const Profile = () => {
               </Nav.Item>
             </>
           )}
+          <Nav.Item>
+            <Nav.Link eventKey="schoolDetails">School Details</Nav.Link>
+          </Nav.Item>
         </Nav>
         <Tab.Content>
           <Tab.Pane eventKey="personalDetails" active={activeTab === 'personalDetails'}>
@@ -173,6 +207,9 @@ const Profile = () => {
               </Tab.Pane>
             </>
           )}
+          <Tab.Pane eventKey="schoolDetails" active={activeTab === 'schoolDetails'}>
+            {renderSchoolDetails()}
+          </Tab.Pane>
         </Tab.Content>
       </Container>
     </>

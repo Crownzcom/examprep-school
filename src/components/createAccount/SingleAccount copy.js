@@ -6,21 +6,18 @@ import { faUser, faUserPlus, faCheck, faDownload, faUserGraduate, faReceipt, faI
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import { capitalizeFirstLetter } from '../../utilities/otherUtils.js';
-import { getSubCodeDetails, updateSubCodeAtCrownzcom } from './utils.js';
-import { useAuth } from "../../context/AuthContext";
-import { serverUrl, mainServerUrl } from "../../config.js";
+import { getSubCodeDetails } from './utils.js';
+import { serverUrl } from "../../config.js";
 import db from '../../db';
 import './SingleAccount.css';
 
-const SingleAccount = ({ user_Type, oneType }) => {
+const url = `${serverUrl}/create-account/create-users`;
 
-  const { schoolInfo } = useAuth();
-
-  const staticUserType = oneType === true ? true : false;
+const SingleAccount = () => {
   const navigate = useNavigate();
 
   const initializeFormData = (userType) => ({
-    userType: staticUserType ? user_Type : userType,
+    userType: userType,
     firstName: '',
     lastName: '',
     otherName: '',
@@ -28,7 +25,7 @@ const SingleAccount = ({ user_Type, oneType }) => {
     studClass: '',
     stream: '',
     subCode: '',
-    label: staticUserType ? user_Type : userType === 'admin' ? ['admin'] : ['student'],
+    label: userType === 'admin' ? ['admin'] : ['student'],
   });
 
   const [userCred, setUserCred] = useState([]);
@@ -141,19 +138,14 @@ const SingleAccount = ({ user_Type, oneType }) => {
       setLoader(true);
       setResponseMessage('');
 
-      // Check Subscription Code validation
-      const subCodeResponse = userType === 'student' ? await getSubCodeDetails(formData.subCode, schoolInfo.schoolID) : null;
-
-      if (userType === 'student') {
-        if (subCodeResponse.codeInfo.remainingStudents === 0 || subCodeResponse.valid === false) {
-          setResponseMessage('The provided subscription code is invalid or expired. Please try again, or contact support for help.')
-          throw new Error('The provided subscription code is invalid or expired. Please try again, or contact support for help.')
-        }
+      //Check Subscription Code validation
+      const subCodeResponse = userType === 'student' ? await getSubCodeDetails(formData.subCode, 'ple003') : null;
+      console.log('subCodeResponse: ', subCodeResponse);
+      if (!subCodeResponse.valid) {
+        setResponseMessage('The provided subscription code is invalid or expired. Please try again, or contact support for help.')
       }
 
-      console.log('Form Data: ', formData)
-
-      const response = await fetch(`${serverUrl}/create-account/create-users`, {
+      const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -165,45 +157,11 @@ const SingleAccount = ({ user_Type, oneType }) => {
         console.log("code failed ", response)
         throw new Error('Network response not ok');
       }
-
       const data = await response.json();
-
-      console.log('Received response from server: ', data)
-
-      if (data.createdUsers.length === 0) {
-        console.log('no user created')
-        throw new Error("No account was created from the server-side.")
-      }
-
-      // Update School Database and Crownzcom database with the used subscription information
-      if (userType === 'student') {
-        //TODO: Update subscription information school appwrite
-        /**
-         * {data.createdUsers, subCodeResponse.codeInfo,}
-         * 1: Must first implement server-side route. Request sent should be an array of objects e.g. {students:[{userId:'STU001'}], subCode:'ABC123', package:'Starter Pack', startDate: 'Day/Time', endDate: 'Day/Time'}
-         * 2. submit the data to be server-side to be updated to the database [userId, subCode, package, startDate, endDat]
-         */
-
-        const dataToUpdateSchoolDb = { //The appwrite table will be updated to have only [userID, subCode, endDate]
-          students: data.createdUsers,
-          subCode: subCodeResponse.codeInfo.subCode.subCode,
-          endDate: subCodeResponse.codeInfo.subCode.expiryDate,
-        }
-
-        console.log('User subscription data sent to server-side: ', dataToUpdateSchoolDb)
-
-        //Update Crownzcom database with the used subscription information
-        await updateSubCodeAtCrownzcom({
-          subCode: subCodeResponse.codeInfo.subCode,
-          remainingStudents: (subCodeResponse.codeInfo.remainingStudents - data.noOfCreatedUsers)
-        })
-      }
-
-      console.log('Credentials Received: ', data.createdUsers)
 
       setAccountCreated(true);
       setResponseMessage('User created successfully');
-      setUserCred(data.createdUsers);
+      setUserCred(data);
       setPdfReady(true);
       setFormData(initializeFormData(userType)); // Reset the form only if the submission is successful
       setLoader(false);
@@ -230,13 +188,9 @@ const SingleAccount = ({ user_Type, oneType }) => {
               <Card.Body>
                 {responseMessage && <Alert variant={responseMessage.includes('successfully') ? 'success' : 'danger'}>{responseMessage}</Alert>}
                 <ListGroup variant="flush">
-                  {userCred.length > 0 && (
-                    <>
-                      <ListGroup.Item><b>Name: </b>{userCred[0].firstName}</ListGroup.Item>
-                      <ListGroup.Item><b>ID: </b>{userCred[0].userID}</ListGroup.Item>
-                      <ListGroup.Item><b>Password: </b>{userCred[0].password}</ListGroup.Item>
-                    </>
-                  )}
+                  <ListGroup.Item><b>Name: </b>{userCred[0].firstName}</ListGroup.Item>
+                  <ListGroup.Item><b>ID: </b>{userCred[0].userID}</ListGroup.Item>
+                  <ListGroup.Item><b>Password: </b>{userCred[0].password}</ListGroup.Item>
                 </ListGroup>
                 {pdfReady && (
                   <Button variant="outline-success" className="w-100 mt-3" onClick={generatePDF}>
@@ -274,12 +228,8 @@ const SingleAccount = ({ user_Type, oneType }) => {
                     </Form.Label>
                     <Form.Control as="select" value={userType} onChange={handleUserTypeChange} required>
                       <option value="">Select User Type</option>
-                      {staticUserType && user_Type === 'admin' ?
-                        <option value="admin">Admin</option> :
-                        <>
-                          <option value="student">Student</option>
-                          <option value="admin">Admin</option>
-                        </>}
+                      <option value="student">Student</option>
+                      <option value="admin">Admin</option>
                     </Form.Control>
                   </Form.Group>
                   {userType && (

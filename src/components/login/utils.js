@@ -1,19 +1,10 @@
-import {
-    databases,
-    database_id,
-    studentTable_id,
-    studentMarksTable_id,
-    classesTable_id,
-    subjectsTable_id,
-    examsTable_id,
-    Query,
-} from "../../appwriteConfig.js";
 import { serverUrl } from "../../config.js"
 import db from '../../db'
 
 /* Helper Funtions */
 
 /* EXPORTED FUNCTIOMS */
+//Clear selected IndexDB tables
 export const clearAllTables = async () => {
     try {
         await db.transaction('rw', db.subjects, db.exams, db.examAnswers, db.students, db.classes, db.schoolData, async () => {
@@ -28,5 +19,40 @@ export const clearAllTables = async () => {
     } catch (error) {
         console.error("Error clearing all tables:", error);
         throw error;
+    }
+};
+
+
+
+//Fetch appwrite data from server-side
+export const fetchAppWriteData = async () => {
+    try {
+        const response = await fetch(`${serverUrl}/login/env`); // Make sure the URL matches your server's route
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const data = await response.json(); // Parse the JSON data
+        console.log('from server: ', data);
+
+        // Prepare data for IndexedDB
+        const appwriteData = {
+            endpoint: data.APPWRITE_ENDPOINT,
+            project_Id: data.APPWRITE_PROJECT_ID,
+            database_id: data.DATABASE_ID,
+            studentTable_id: data.STUDENT_TABLE_ID,
+            studentMarksTable_id: data.STUDENT_RESULTS_TABLE_ID,
+            subjectsTable_id: data.SUBJECTS_TABLE_ID,
+            examsTable_id: data.SET_EXAMS_TABLE_ID,
+            classesTable_id: data.CLASSES_TABLE_ID,
+            schoolTable_id: data.SCHOOL_TABLE_ID
+        };
+
+        // Save to IndexedDB
+        await db.appwriteData.clear(); // Clear any existing data (optional)
+        await db.appwriteData.add(appwriteData);
+
+        console.log('Appwrite data saved to IndexedDB:', appwriteData);
+    } catch (error) {
+        console.error('Error fetching AppWrite data:', error);
     }
 };

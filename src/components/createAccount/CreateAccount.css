@@ -1,26 +1,38 @@
-/* CreateAccount.css */
-
-.nav-tabs {
-    margin-top: 20px;
-    justify-content: center;
+.custom-button {
+    background-color: #007bff;
+    border: none;
+    border-radius: 30px;
+    padding: 15px 30px;
+    font-size: 18px;
+    transition: background-color 0.3s ease-in-out, transform 0.3s ease-in-out;
 }
 
-.nav-link {
-    font-size: 1.1rem;
-    font-weight: 500;
-    transition: color 0.3s ease, background 0.3s ease;
+.custom-button:hover {
+    background-color: #0056b3;
+    transform: translateY(-3px);
 }
 
-.nav-link.active {
-    color: #047d4c !important;
-    /* background: #764ba2; */
+.custom-button:focus {
+    outline: none;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.5);
 }
 
-.nav-link:hover {
-    color: #764ba2;
+.card {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
 }
 
-.tab-content {
-    padding-top: 20px;
-    transition: opacity 0.5s ease;
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.card-footer {
+    background-color: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+}
+
+.modal-70w {
+    width: 70%;
 }

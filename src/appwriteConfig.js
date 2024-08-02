@@ -2,28 +2,79 @@
 import { Client, Account, Databases, Permission, Role, Query, ID } from "appwrite";
 import db from './db.js';
 
-/* LOCALHOST - DERRICKML */
+/**
+ * =================================================================
+ * FETCHING APPWRITE DATA FROM INDEX DB
+ * =================================================================
+ */
+const appwriteDataArray = await db.appwriteData.toArray(); // Fetch all entries from the appwriteData table
+
+// Handle the case where appwriteData might be null or undefined
+if (appwriteDataArray.length === 0) {
+  console.error("Appwrite data not found in IndexedDB.");
+}
+
+const data = appwriteDataArray[0]; // Assuming there's only one entry in the table
+
+const appwriteData = {
+  APPWRITE_ENDPOINT: data?.endpoint ?? '',
+  APPWRITE_PROJECT_ID: data?.project_Id ?? '',
+  DATABASE_ID: data?.database_id ?? '',
+  STUDENT_TABLE_ID: data?.studentTable_id ?? '',
+  STUDENT_RESULTS_TABLE_ID: data?.studentMarksTable_id ?? '',
+  SET_EXAMS_TABLE_ID: data?.examsTable_id ?? '',
+  CLASSES_TABLE_ID: data?.classesTable_id ?? '',
+  SUBJECTS_TABLE_ID: data?.subjectsTable_id ?? '',
+  SCHOOL_TABLE_ID: data?.schoolTable_id ?? '',
+  // Add the other fields as necessary
+};
+
+const appwriteDataDestructured = appwriteData;
+
+const {
+  APPWRITE_ENDPOINT,
+  APPWRITE_PROJECT_ID,
+  DATABASE_ID,
+  STUDENT_TABLE_ID,
+  STUDENT_RESULTS_TABLE_ID,
+  SET_EXAMS_TABLE_ID,
+  CLASSES_TABLE_ID,
+  SUBJECTS_TABLE_ID,
+  SCHOOL_TABLE_ID,
+  // Add the other fields as necessary
+} = appwriteDataDestructured
+
+
+/**
+ * =================================================================
+ * SETTING UP APPWRITE CONFIGURATION
+ * =================================================================
+ */
+// const client = new Client()
+//   .setEndpoint(APPWRITE_ENDPOINT)
+//   .setProject(APPWRITE_PROJECT_ID)
+
 const client = new Client()
-  .setEndpoint('http://localhost/v1')
-  .setProject('6666c877a1b3d17050ad')
+  .setEndpoint('https://appwrite.exampreptutor.com/v1')
+  .setProject('66ac8ccd001f073c0692')
 
 const account = new Account(client);
 const databases = new Databases(client);
 
-//Localhost - Appwrite
-const database_id = "6672ac400013d6d9b661";
-const studentTable_id = "6672ac5e001a8956108d";
-const nextOfKinTable_id = "";
-const studentMarksTable_id = "6672ac8f002b446168f7";
+const database_id = DATABASE_ID;
+const studentTable_id = STUDENT_TABLE_ID;
+const studentMarksTable_id = STUDENT_RESULTS_TABLE_ID;
+const subjectsTable_id = SUBJECTS_TABLE_ID
+const examsTable_id = SET_EXAMS_TABLE_ID
+const classesTable_id = CLASSES_TABLE_ID
+const schoolTable_id = SCHOOL_TABLE_ID
 const couponTable_id = ""
 const transactionTable_id = ""
 const pointsTable_id = ''
 const pointsBatchTable_id = ''
-const subjectsTable_id = '6672acc7000add6b2499'
 const couponUsagesTable_id = ''
 const updatedAttemptedQtnsTable_id = ''
-const examsTable_id = '6672ac9f0003f9f10bf3'
-const classesTable_id = '6672acb400276c693d17'
+const nextOfKinTable_id = "";
 
 // Export the required parts
 export {
@@ -43,6 +94,7 @@ export {
   updatedAttemptedQtnsTable_id,
   examsTable_id,
   classesTable_id,
+  schoolTable_id,
   Permission,
   Role,
   Query,

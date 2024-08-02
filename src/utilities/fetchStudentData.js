@@ -7,6 +7,7 @@ import {
   subjectsTable_id,
   examsTable_id,
   classesTable_id,
+  schoolTable_id,
   Query,
 } from "../appwriteConfig.js";
 import { serverUrl } from "../config.js"
@@ -199,6 +200,50 @@ export const updateClassData = async () => {
   } catch (error) {
     console.error('Error updating classes index db table:', error);
     throw new Error('Error updating classes index db table:', error);
+  }
+};
+
+//Fetch school data
+export const updateSchoolData = async () => {
+  try {
+
+    // Fetch school data
+    const schoolData = await getDocs(schoolTable_id, [])
+
+    console.log(schoolData);
+
+    const fetchedSchoolData = schoolData.length < 1 ? null : schoolData[0]
+
+    if (!db.isOpen()) {
+      await db.open();
+    }
+
+    await db.transaction('rw', db.schoolData, async () => {
+      // Clear the existing entries in the exams table
+      await db.schoolData.clear();
+
+      // Bulk put the new data after clearing the table
+      const savingToIndexDB = await db.schoolData.bulkPut(schoolData.map(data => ({
+        ...data,
+        schoolID: data.schoolID,
+        educationLevel: data.educationLevel,
+        name: data.name,
+        address: data.address,
+        email: data.email,
+        email2: data.email2,
+        phone: data.phone,
+        phone2: data.phone2,
+        creationDate: data.creationDate,
+      })));
+
+      // console.log('IndexDB response: ', savingToIndexDB);
+    });
+
+    return fetchedSchoolData;
+
+  } catch (error) {
+    console.error('Error updating schoolData index db table:', error);
+    throw new Error('Error updating schoolData index db table:', error);
   }
 };
 

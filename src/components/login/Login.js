@@ -5,10 +5,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faLock } from '@fortawesome/free-solid-svg-icons';
 import { useAuth } from "../../context/AuthContext.js";
 import { fetchAndUpdateResults } from "../../utilities/resultsUtil";
-import { fetchAndProcessStudentData, initiateIndexDB, fetchSetExams, updateSubjectsData, updateClassData, updateResultsData } from "../../utilities/fetchStudentData";
+import { updateSchoolData, initiateIndexDB, fetchSetExams, updateSubjectsData, updateClassData, updateResultsData } from "../../utilities/fetchStudentData";
 import storageUtil from '../../utilities/storageUtil.js';
 import db from '../../db.js';
-import { clearAllTables } from './utils.js'
+import { clearAllTables, fetchAppWriteData } from './utils.js'
 import {
     account
 } from "../../appwriteConfig.js";
@@ -33,11 +33,11 @@ const Login = () => {
         if (sessionInfo && sessionInfo.$id) {
             try {
                 const response = await account.deleteSession(sessionInfo.$id); // Clears the session on Client's and Appwrite's side
-                console.log('session deleted: ', response);
+                // console.log('session deleted: ', response);
                 // Clear rest of stored data
                 sessionInfo = storageUtil.getItem("sessionInfo");
                 localStorage.clear();
-                console.log('session cleared: ', sessionInfo);
+                // console.log('session cleared: ', sessionInfo);
             } catch (error) {
                 console.error("Logout failed", error);
             }
@@ -64,14 +64,22 @@ const Login = () => {
 
     // Logout user in case they are already logged in on component mount
     useEffect(() => {
+
+        //Clear session data
         const clearSession = async () => {
             await handleLogout();
             localStorage.clear();
         };
+
         clearSession();
 
         // Clear session storage
         sessionStorage.clear();
+    }, []);
+
+    // Fetch new appwrite data
+    useEffect(() => {
+        fetchAppWriteData();
     }, []);
 
     const handleUserLogin = async (e) => {
@@ -84,7 +92,7 @@ const Login = () => {
         }
 
         try {
-            const response = await fetch("http://localhost:3001/login/getEmail", {
+            const response = await fetch(`${serverUrl}/login/getEmail`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -124,8 +132,13 @@ const Login = () => {
             userDetails = userInfo
             console.log('user info: ', userInfo)
 
+
+
+            //Fetch school data
+            const schoolInfo = await updateSchoolData();
+
             console.log('AuthContext Handling Login Session')
-            await handleLogin(sessionData, userInfo); // Pass the session data to App.js
+            await handleLogin(sessionData, userInfo, schoolInfo !== null ? schoolInfo : {}); // Pass the session data to App.js
 
             // //Save data to indexDb
             // await initiateIndexDB(userInfo)

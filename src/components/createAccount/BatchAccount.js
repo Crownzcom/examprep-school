@@ -1,294 +1,325 @@
-import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Form, Button, Alert, Card } from 'react-bootstrap';
+import React, { useState, useRef } from 'react';
+import { Container, Row, Col, Form, Button, Alert, Card, Spinner, ButtonGroup } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFileUpload, faCheck, faFileCsv, faFileExcel } from '@fortawesome/free-solid-svg-icons';
+import { faUpload, faFileCsv, faFileExcel, faDownload, faCheckCircle, faExclamationTriangle, faKey } from '@fortawesome/free-solid-svg-icons';
 import Papa from 'papaparse';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
-import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
+import * as XLSX from 'xlsx';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+import { getSubCodeDetails, updateSubCodeAtCrownzcom } from './utils.js';
+import { useAuth } from "../../context/AuthContext";
 import db from '../../db';
-import './BatchAccount.css';
-
-const url = 'http://localhost:3001/create-account/create-users';
+import { serverUrl, mainServerUrl } from "../../config.js";
 
 const BatchAccount = () => {
-  const [users, setUsers] = useState([]);
-  const [selectedFile, setSelectedFile] = useState(null);
+  const { schoolInfo } = useAuth()
+  const [file, setFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
-  const [confirmation, setConfirmation] = useState('');
-  const [pdfReady, setPdfReady] = useState(false);
-  const [classes, setClasses] = useState([]);
-  const [invalidEntries, setInvalidEntries] = useState([]);
-
-  useEffect(() => {
-    const fetchClasses = async () => {
-      const fetchedClasses = await db.classes.toArray();
-      setClasses(fetchedClasses);
-    };
-
-    fetchClasses();
-  }, []);
+  const [uploadMessage, setUploadMessage] = useState('');
+  const [createdUsers, setCreatedUsers] = useState([]);
+  const [usersCreated, setUsersCreated] = useState(false)
+  const [subscriptionCode, setSubscriptionCode] = useState('');
+  const [codeValid, setCodeValid] = useState(false);
+  const [subCodeInfo, setSubCodeInfo] = useState({});
+  const [remainingStudents, setRemainingStudents] = useState(0);
+  const [codeMessage, setCodeMessage] = useState('');
+  const fileInputRef = useRef(null);
 
   const handleFileChange = (e) => {
-    setSelectedFile(e.target.files[0]);
+    const selectedFile = e.target.files[0];
+    if (selectedFile) {
+      setFile(selectedFile);
+    } else {
+      setFile(null);
+    }
+    setUploadMessage('');
   };
 
-  const expectedHeaders = [
-    'userType',
-    'firstName',
-    'lastName',
-    'otherName',
-    'gender',
-    'studClass',
-    'stream'
-  ];
-
-  const validateHeaders = (headers) => {
-    return headers.length === expectedHeaders.length && expectedHeaders.every((header, index) => header === headers[index]);
+  const handleSubscriptionCodeChange = (e) => {
+    setSubscriptionCode(e.target.value || '');
+    setCodeMessage('');
   };
 
-  const validateUsers = async (data) => {
-    const invalidEntries = [];
-    const validEntries = [];
+  const validateSubscriptionCode = async () => {
+    try {
+      const result = await getSubCodeDetails(subscriptionCode, schoolInfo.schoolID);
+      console.log('Sub code details: ', result);
 
-    for (const row of data) {
-      const user = {
-        userType: row.userType,
-        firstName: row.firstName,
-        lastName: row.lastName,
-        otherName: row.otherName || null,
-        gender: row.gender,
-        label: row.userType === 'admin' ? ['admin'] : ['student'],
-      };
-
-      if (row.userType === 'student') {
-        const classObj = classes.find(cls => cls.classID === row.studClass);
-        if (!classObj) {
-          invalidEntries.push({ ...user, studClass: row.studClass, stream: row.stream, error: 'Invalid class' });
-          continue;
-        }
-        const streams = JSON.parse(classObj.streams);
-        if (!streams.includes(row.stream)) {
-          invalidEntries.push({ ...user, studClass: row.studClass, stream: row.stream, error: 'Invalid stream' });
-          continue;
-        }
-        user.studClass = row.studClass;
-        user.stream = row.stream;
+      if (result.codeInfo.remainingStudents === 0 || !result.valid) {
+        setCodeMessage('The provided subscription code is invalid or expired. Please try again, or contact support for help.');
+        throw new Error('The provided subscription code is invalid or expired. Please try again, or contact support for help.')
       }
 
-      if (row.userType === 'student') {
-        if (user.userType && user.firstName && user.lastName && user.gender && user.studClass && user.stream) {
-          validEntries.push(user);
-        } else {
-          invalidEntries.push({ ...user, error: 'Missing fields' });
-        }
-      } else {
-        if (user.userType && user.firstName && user.lastName && user.gender) {
-          validEntries.push(user);
-        } else {
-          invalidEntries.push({ ...user, error: 'Missing fields' });
-        }
+      setCodeValid(true);
+      setRemainingStudents(result.codeInfo.remainingStudents);
+      setCodeMessage('Subscription code is valid.');
+      setSubCodeInfo(result.codeInfo);
+
+    } catch (error) {
+      console.error('The provided subscription code is invalid or expired. Please try again, or contact support for help... ', error);
+      setCodeMessage('The provided subscription code is invalid or expired. Please try again, or contact support for help.');
+    }
+  };
+
+  const downloadTemplate = (type) => {
+    const headers = ['firstName', 'lastName', 'otherName', 'gender', 'studClass', 'stream'];
+    let data = [headers];
+
+    if (type === 'csv') {
+      const csvData = Papa.unparse(data);
+      const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+      saveAs(blob, 'template.csv');
+    } else {
+      const ws = XLSX.utils.aoa_to_sheet(data);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Template');
+      XLSX.writeFile(wb, 'template.xlsx');
+    }
+  };
+
+  const validateData = async (data) => {
+    // Fetch class data from the database
+    const classData = await db.classes.toArray();
+    console.log('Class Data from DB:', classData);
+
+    const validClasses = classData.map((cls) => cls.classID);
+    console.log('Valid Classes:', validClasses);
+
+    const errors = [];
+    const validData = data.filter((row, index) => {
+      if (row.length !== 6) {
+        errors.push(`Row ${index + 1}: Incorrect number of fields`);
+        return false;
       }
+      const [firstName, lastName, otherName, gender, studClass, stream] = row;
+      console.log(`Row ${index + 1} - Class: ${studClass}, Stream: ${stream}`);
+
+      // Check if the class exists
+      const classInfo = classData.find((cls) => cls.classID === studClass);
+      if (!classInfo) {
+        errors.push(`Row ${index + 1}: Invalid class ${studClass}`);
+        return false;
+      }
+
+      // Check if the stream exists within the class
+      const streams = JSON.parse(classInfo.streams);
+      console.log(`Class ${studClass} - Streams: ${streams}`);
+      if (!streams.includes(stream)) {
+        errors.push(`Row ${index + 1}: Invalid stream ${stream} for class ${studClass}`);
+        return false;
+      }
+
+      return true;
+    });
+
+    console.log('Valid Data:', validData);
+    console.log('Errors:', errors);
+
+    return { validData, errors };
+  };
+
+  const handleFileUpload = async () => {
+    if (!file) {
+      setUploadMessage('Please select a file to upload.');
+      return;
     }
 
-    setInvalidEntries(invalidEntries);
-    return validEntries;
+    setIsUploading(true);
+    let data = [];
+    if (file.name.endsWith('.csv')) {
+      const csv = await file.text();
+      data = Papa.parse(csv, { skipEmptyLines: true }).data;
+    } else if (file.name.endsWith('.xlsx')) {
+      const arrayBuffer = await file.arrayBuffer();
+      const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+      const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+      data = XLSX.utils.sheet_to_json(firstSheet, { header: 1, raw: false, blankrows: false });
+    }
+
+    console.log('Uploaded Data:', data);
+
+    // Remove header row
+    const header = data.shift();
+    console.log('Header:', header);
+
+    const { validData, errors } = await validateData(data);
+
+    if (errors.length > 0) {
+      setUploadMessage(`Errors found:\n${errors.join('\n')}`);
+      setIsUploading(false);
+      return;
+    }
+
+    if (validData.length > remainingStudents) {
+      setUploadMessage(`The number of students in the file exceeds the remaining allowed students. Maximum allowed is ${remainingStudents}.`);
+      setIsUploading(false);
+      return;
+    }
+
+    const userPayload = validData.map(([firstName, lastName, otherName, gender, studClass, stream]) => ({
+      userType: 'student',
+      firstName,
+      lastName,
+      otherName: otherName || null,
+      gender,
+      studClass,
+      stream,
+      label: ['student'],
+    }));
+
+    try {
+      const response = await fetch(`${serverUrl}/create-account/create-users`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userPayload),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        setCreatedUsers(result);
+        setUploadMessage('Users created successfully!');
+
+        if (result.createdUsers.length === 0) {
+          console.log('no user created')
+          throw new Error("No account was created from the server-side.")
+        }
+
+        //Update Crownzcom database with the used subscription code
+        await updateSubCodeAtCrownzcom({
+          subCode: subCodeInfo.subCode,
+          remainingStudents: (subCodeInfo.remainingStudents - result.noOfCreatedUsers)
+        })
+
+        setUsersCreated(true)
+
+      } else {
+        setUploadMessage('Failed to create users.');
+      }
+    } catch (error) {
+      setUploadMessage('Error uploading users.');
+    } finally {
+      setIsUploading(false);
+      // Reset the file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+      setFile(null);
+    }
   };
 
   const generatePDF = () => {
     const doc = new jsPDF();
-    doc.text('User Credentials', 14, 20);
-    const tableColumn = ['UserID', 'First Name', 'Last Name', 'Class', 'Stream', 'Password'];
-    const tableRows = [];
+    const tableColumn = ['UserID', 'First Name', 'Last Name', 'Other Name', 'Email', 'Class', 'Stream', 'Password'];
+    const tableRows = createdUsers.map((user) => [
+      user.userID,
+      user.firstName,
+      user.lastName,
+      user.otherName,
+      user.email,
+      user.studClass,
+      user.stream,
+      user.password,
+    ]);
 
-    users.forEach((user) => {
-      const userData = [
-        user.userID,
-        user.firstName,
-        user.lastName,
-        user.studClass ?? 'N/A',
-        user.stream ?? 'N/A',
-        user.password,
-      ];
-      tableRows.push(userData);
-    });
+    doc.text('User Credentials', 14, 15);
 
-    autoTable(doc, {
+    // Updated autoTable initiation
+    doc.autoTable({
       head: [tableColumn],
       body: tableRows,
-      startY: 30,
+      startY: 20,
     });
 
     doc.save('user_credentials.pdf');
   };
 
-  const generateTemplate = (type) => {
-    const templateData = [expectedHeaders];
-    if (type === 'csv') {
-      const csvContent = Papa.unparse(templateData);
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-      saveAs(blob, 'user_template.csv');
-    } else {
-      const wb = XLSX.utils.book_new();
-      const ws = XLSX.utils.aoa_to_sheet(templateData);
-      XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-      const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-      const blob = new Blob([wbout], { type: 'application/octet-stream' });
-      saveAs(blob, 'user_template.xlsx');
-    }
-  };
-
-  const uploadUsers = async (formattedUsers) => {
-    try {
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formattedUsers),
-      });
-
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-
-      const data = await response.json();
-      setConfirmation('Users uploaded successfully');
-      setUsers(data);
-      setPdfReady(true);
-    } catch (error) {
-      setConfirmation('Error uploading users');
-    } finally {
-      setIsUploading(false);
-      setTimeout(() => setConfirmation(''), 5000);
-    }
-  };
-
-  const handleFileUpload = async (e) => {
-    e.preventDefault();
-    setIsUploading(true);
-
-    if (!selectedFile) {
-      setConfirmation('No file selected');
-      setIsUploading(false);
-      setTimeout(() => setConfirmation(''), 3000);
-      return;
-    }
-
-    const fileExtension = selectedFile.name.split('.').pop().toLowerCase();
-
-    const handleValidation = async (data) => {
-      const validEntries = await validateUsers(data);
-
-      if (invalidEntries.length > 0) {
-        setConfirmation(`Invalid entries found: ${invalidEntries.map(entry => `${entry.firstName} ${entry.lastName} (${entry.error})`).join(', ')}`);
-        setIsUploading(false);
-        setTimeout(() => setConfirmation(''), 6000);
-        return;
-      }
-
-      uploadUsers(validEntries);
-    };
-
-    if (fileExtension === 'csv') {
-      Papa.parse(selectedFile, {
-        header: true,
-        complete: async (result) => {
-          if (!validateHeaders(result.meta.fields)) {
-            setConfirmation('Invalid CSV headers. Please check your file.');
-            setIsUploading(false);
-            setTimeout(() => setConfirmation(''), 6000);
-            return;
-          }
-          await handleValidation(result.data);
-        },
-      });
-    } else if (['xls', 'xlsx', 'xlsm'].includes(fileExtension)) {
-      const reader = new FileReader();
-      reader.onload = async (event) => {
-        const data = new Uint8Array(event.target.result);
-        const workbook = XLSX.read(data, { type: 'array' });
-        const sheet = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { header: 1 });
-
-        if (!validateHeaders(sheet[0])) {
-          setConfirmation('Invalid Excel headers. Please check your file.');
-          setIsUploading(false);
-          setTimeout(() => setConfirmation(''), 6000);
-          return;
-        }
-
-        const dataRows = sheet.slice(1).map((row) => {
-          const rowData = {};
-          sheet[0].forEach((header, index) => {
-            rowData[header] = row[index];
-          });
-          return rowData;
-        });
-
-        await handleValidation(dataRows);
-      };
-      reader.readAsArrayBuffer(selectedFile);
-    } else {
-      setConfirmation('Unsupported file type');
-      setIsUploading(false);
-      setTimeout(() => setConfirmation(''), 6000);
-    }
-  };
-
   return (
-    <Container className="signup-container">
-      <Row className="justify-content-md-center">
-        <Col md={8}>
-          <Card className="file-upload-card">
-            <Card.Header className="text-center">
-              <h3><FontAwesomeIcon icon={faFileUpload} /> Import Users</h3>
+    <Container>
+      <Row className="my-4">
+        <Col>
+          <Card>
+            <Card.Header className="bg-primary text-white text-center">
+              <h4><FontAwesomeIcon icon={faUpload} /> Batch Accounts Registration</h4>
             </Card.Header>
             <Card.Body>
-              {confirmation && (
-                <Alert variant={confirmation.includes('successfully') ? 'success' : 'danger'}>
-                  {confirmation}
-                </Alert>
-              )}
-              <Form onSubmit={handleFileUpload}>
-                <Form.Group>
-                  <Form.Label>Accepted File Types:</Form.Label>
-                  <ul>
-                    <li>
-                      CSV (.csv)
-                      <Button variant="info" size="sm" className="ml-2" onClick={() => generateTemplate('csv')}>
-                        <FontAwesomeIcon icon={faFileCsv} /> Download csv template
-                      </Button>
-                    </li>
-                    <li>
-                      Excel (.xls, .xlsx, .xlsm)
-                      <Button variant="info" size="sm" className="ml-2" onClick={() => generateTemplate('xlsx')}>
-                        <FontAwesomeIcon icon={faFileExcel} /> Download excel template
-                      </Button>
-                    </li>
-                  </ul>
-                </Form.Group>
-                <Form.Group>
-                  <Form.Label>Choose file</Form.Label>
-                  <Form.Control
-                    type="file"
-                    onChange={handleFileChange}
-                    accept=".csv, .xls, .xlsx, .xlsm"
-                  />
-                </Form.Group>
-                {selectedFile && (
-                  <Button variant="success" type="submit" disabled={isUploading} className="w-100 mt-3">
-                    {isUploading ? 'Uploading...' : 'Upload File'}
+              {!codeValid ? (
+                <>
+                  <Form>
+                    <Form.Group>
+                      <Form.Label>Enter Subscription Code</Form.Label>
+                      <Form.Control
+                        type="text"
+                        placeholder="Enter code"
+                        value={subscriptionCode}
+                        onChange={handleSubscriptionCodeChange}
+                      />
+                    </Form.Group>
+                    <Button onClick={validateSubscriptionCode} className="w-100 mt-3" variant="primary">
+                      Validate Code
+                    </Button>
+                  </Form>
+                  {codeMessage && (
+                    <Alert variant={codeMessage === 'Subscription code is valid.' ? 'success' : 'danger'} className="mt-3">
+                      {codeMessage}
+                    </Alert>
+                  )}
+                </>
+              ) : (
+                <>
+                  <Form>
+                    <Form.Group>
+                      <Form.Label>Select CSV or Excel File</Form.Label>
+                      <Form.Control
+                        type="file"
+                        onChange={handleFileChange}
+                        ref={fileInputRef}
+                        key={file || ''} // Add a key to ensure re-render
+                      />
+                    </Form.Group>
+                    <Button
+                      onClick={handleFileUpload}
+                      disabled={!file || isUploading}
+                      className="w-100 mt-3"
+                      variant="primary"
+                    >
+                      {isUploading ? <Spinner animation="border" size="sm" /> : 'Upload'}
+                    </Button>
+                  </Form>
+                  <hr />
+                  <h5 className="text-center mt-4">Download Templates</h5>
+                  <ButtonGroup className="w-100">
+                    <Button variant="outline-primary" onClick={() => downloadTemplate('csv')}>
+                      <FontAwesomeIcon icon={faFileCsv} /> CSV Template
+                    </Button>
+                    <Button variant="outline-success" onClick={() => downloadTemplate('xlsx')}>
+                      <FontAwesomeIcon icon={faFileExcel} /> Excel Template
+                    </Button>
+                  </ButtonGroup>
+                  {/* {isUploading && ( */}
+                  <Button
+                    variant="success"
+                    onClick={generatePDF}
+                    className="w-100 mt-4"
+                  >
+                    <FontAwesomeIcon icon={faDownload} /> Download Credentials
                   </Button>
-                )}
-              </Form>
-              {pdfReady && (
-                <Button variant="primary" className="w-100 mt-3" onClick={generatePDF}>
-                  <FontAwesomeIcon icon={faCheck} /> Download PDF
-                </Button>
+                  {/* )} */}
+                </>
               )}
             </Card.Body>
           </Card>
         </Col>
       </Row>
+      {uploadMessage && (
+        <Row className="my-4">
+          <Col>
+            <Alert variant={uploadMessage.startsWith('Error') ? 'danger' : 'success'}>
+              {uploadMessage.startsWith('Error') ? <FontAwesomeIcon icon={faExclamationTriangle} /> : <FontAwesomeIcon icon={faCheckCircle} />} {uploadMessage}
+            </Alert>
+          </Col>
+        </Row>
+      )}
     </Container>
   );
 };

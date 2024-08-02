@@ -10,6 +10,7 @@ import {
 import { useAuth } from "../../context/AuthContext";
 import db from '../../db';
 import moment from 'moment-timezone';
+import { serverUrl } from '../../config.js'
 import './ScheduleExam.css'; // Import custom CSS
 
 const ScheduleExam = () => {
@@ -83,11 +84,13 @@ const ScheduleExam = () => {
         };
 
         try {
-            const response = await fetch(`http://localhost:3001/exam/fetch-exam?collection_id=${examData.examTableId}&subjectName=${examData.subjectName}`);
+            const response = await fetch(`${serverUrl}/exam/fetch-exam?collection_id=${examData.examTableId}&subjectName=${examData.subjectName}`);
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
             const fetchedExamData = await response.json();
+
+            console.log('Fetched exam data: ', fetchedExamData)
 
             const completeExamData = {
                 ...examData,

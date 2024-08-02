@@ -1,23 +1,18 @@
-.container {
-    background: linear-gradient(45deg, #033866, #167477) !important;
-
+/* src/index.css */
+body {
+    background-color: #f8f9fa;
 }
 
-.submit-button {
-    transition: background-color 0.3s ease;
+h1,
+h2 {
+    color: #343a40;
 }
 
-.submit-button:hover {
-    background-color: #0056b3;
-    /* Darken the button on hover */
+a {
+    color: #007bff;
 }
 
-.draggable-badge {
-    cursor: grab;
-    transition: transform 0.2s ease;
-}
-
-.draggable-badge:hover {
-    transform: scale(1.1);
-    /* Enlarge the badge on hover */
+a:hover {
+    color: #0056b3;
+    text-decoration: none;
 }

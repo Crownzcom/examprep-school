@@ -27,12 +27,6 @@ import { fetchAndUpdateResults } from "../utilities/resultsUtil";
 import { fetchAndProcessStudentData, fetchStudents, fetchTransactions, initiateIndexDB } from "../utilities/fetchStudentData";
 import {
   account,
-  databases,
-  database_id,
-  studentTable_id,
-  nextOfKinTable_id,
-  subjectsTable_id,
-  Query,
 } from "../appwriteConfig.js";
 import { serverUrl } from "../config.js"
 import "./Login.css";

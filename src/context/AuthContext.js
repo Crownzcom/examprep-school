@@ -14,6 +14,8 @@ export const useAuth = () => useContext(AuthContext);
 export const AuthProvider = ({ children }) => {
     const [sessionInfo, setSessionInfo] = useState(storageUtil.getItem("sessionInfo"));
     const [userInfo, setUserInfo] = useState(storageUtil.getItem("userInfo"));
+    const [schoolInfo, setSchoolInfo] = useState(storageUtil.getItem("schoolInfo"));
+
 
     //LOGOUT FUNCTION
     const handleLogout = async () => {
@@ -46,11 +48,15 @@ export const AuthProvider = ({ children }) => {
     }
 
     //LOGIN FUNCTION
-    const handleLogin = async (sessionData, userData) => {
+    const handleLogin = async (sessionData, userData, schoolData = {}) => {
+
+        storageUtil.setItem("schoolInfo", schoolData)
+        setSchoolInfo(schoolData);
 
         console.log('Auth - HandleLogin--userDAsessionData: ', sessionData)
 
         console.log('Auth - HandleLogin--userDATA: ', userData)
+
         const sessionDetails = {
             $id: sessionData.$id,
             userId: sessionData.userId,
@@ -91,6 +97,7 @@ export const AuthProvider = ({ children }) => {
         <AuthContext.Provider value={{
             sessionInfo,
             userInfo,
+            schoolInfo,
             handleLogin,
             handleLogout,
         }}>

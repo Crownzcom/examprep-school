@@ -75,6 +75,8 @@ const SchoolForm = ({ onNext, initialData }) => {
                 <Form.Control type="text" name="schoolName" defaultValue={initialData.schoolName} required />
             </Form.Group>
 
+            <br />
+
             <Form.Group controlId="educationLevel">
                 <Form.Label>Education Level</Form.Label>
                 <Form.Control
@@ -90,20 +92,38 @@ const SchoolForm = ({ onNext, initialData }) => {
                 </Form.Control>
             </Form.Group>
 
+            <br />
+
             <Form.Group controlId="address">
                 <Form.Label>Address</Form.Label>
                 <Form.Control type="text" name="address" defaultValue={initialData.address} required />
             </Form.Group>
+
+            <br />
 
             <Form.Group controlId="phone">
                 <Form.Label>Phone</Form.Label>
                 <Form.Control type="text" name="phone" defaultValue={initialData.phone} required />
             </Form.Group>
 
+            <Form.Group controlId="phone2">
+                <Form.Label>Phone 2 (Optional)</Form.Label>
+                <Form.Control type="text" name="phone2" defaultValue={initialData.phone2} />
+            </Form.Group>
+
+            <br />
+
             <Form.Group controlId="email">
                 <Form.Label>Email</Form.Label>
                 <Form.Control type="email" name="email" defaultValue={initialData.email} required />
             </Form.Group>
+
+            <Form.Group controlId="email2">
+                <Form.Label>Email 2 (Optional)</Form.Label>
+                <Form.Control type="email" name="email2" defaultValue={initialData.email2} />
+            </Form.Group>
+
+            <br />
 
             <Form.Group controlId="streams">
                 <Form.Label>Streams</Form.Label>
@@ -128,6 +148,8 @@ const SchoolForm = ({ onNext, initialData }) => {
                     Add another stream
                 </Button>
             </Form.Group>
+
+            <br />
 
             {educationLevel === 'Primary' && (
                 <Form.Group>

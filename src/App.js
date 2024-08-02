@@ -15,6 +15,8 @@ import AppContent from "./components/navbar/AppContent";
 import Initiate from "./components/initiate/Initiate.js";
 import Login from "./components/login/Login";
 import CreateAccount from "./components/createAccount/CreateAccount.js";
+import SingleAccount from "./components/createAccount/SingleAccount.js";
+import BatchAccount from "./components/createAccount/BatchAccount.js";
 import ForgetPassword from "./components/ForgetPassword";
 import Testing from "./components/Testing";
 import Home from "./components/Home";
@@ -31,6 +33,7 @@ import Answers from "./components/renderAnswer/Answers";
 import RegisteredStudents from "./pages/RegisteredStudents";
 import ScheduleExam from "./components/scheduleExam/ScheduleExam.js"
 import NotFoundPage from './components/NotFoundPage';
+import CreateAdmin from "./components/initiate/CreateAdmin.js"
 import { AuthProvider, useAuth } from './context/AuthContext';
 // import './serviceWorkerListener.js';  // Service worker listener script
 import "./App.css";
@@ -89,8 +92,11 @@ function App() {
               <Route path="/registered-students" element={<PrivateRoute><RegisteredStudents /></PrivateRoute>} />
               <Route path="/schedule-exam" element={<PrivateRoute><ScheduleExam /></PrivateRoute>} />
               <Route path="/initiate" element={<Initiate />} />
+              <Route path="/create-admin" element={<CreateAdmin />} />
               <Route path="/login" element={<Login />} />
               <Route path="/create-account" element={<PrivateRoute><CreateAccount /></PrivateRoute>} />
+              <Route path="/create-account/single" element={<PrivateRoute><SingleAccount /></PrivateRoute>} />
+              <Route path="/create-account/batch" element={<PrivateRoute><BatchAccount /></PrivateRoute>} />
               <Route path="/forget-password" element={<ForgetPassword />} />
               <Route path="/password-reset" element={<PasswordReset />} />
               <Route path="*" element={<NotFoundPage />} />
