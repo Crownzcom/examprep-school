@@ -1,15 +1,28 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Container, Row, Col, Card, Modal, Button, Alert, Spinner } from 'react-bootstrap';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  Modal,
+  Button,
+  Alert,
+  Spinner,
+} from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBookOpen, faWarning, faRefresh } from '@fortawesome/free-solid-svg-icons';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import moment from 'moment';
-import { useAuth } from '../context/AuthContext';
-import Loader from './Loader';
-import db from '../db';
-import { fetchSetExams } from '../utilities/fetchStudentData';
-import './ExamPage.css'; // Import custom CSS
+import {
+  faBookOpen,
+  faWarning,
+  faRefresh,
+} from "@fortawesome/free-solid-svg-icons";
+import "bootstrap/dist/css/bootstrap.min.css";
+import moment from "moment";
+import { useAuth } from "../context/AuthContext";
+import Loader from "./Loader";
+import db from "../db";
+import { fetchSetExams } from "../utilities/fetchStudentData";
+import "./ExamPage.css"; // Import custom CSS
 
 function SelectExam() {
   const { userInfo } = useAuth();
@@ -20,24 +33,34 @@ function SelectExam() {
   const [isRefreshExams, setRefreshExams] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
 
+  console.log("selectedExam", selectedExam);
+
   useEffect(() => {
     const fetchExamsAndResults = async () => {
       try {
         const [examsData, resultsData] = await Promise.all([
           db.exams.toArray(),
-          db.results.toArray()
+          db.results.toArray(),
         ]);
 
-        const doneExamIDs = resultsData.map(result => result.examID);
+        const doneExamIDs = resultsData.map((result) => result.examID);
 
         // Filter out the exams that have already been done
-        const filteredExams = examsData.filter(exam => !doneExamIDs.includes(exam.examID));
+        const filteredExams = examsData.filter(
+          (exam) => !doneExamIDs.includes(exam.examID)
+        );
 
         // Convert dates to ISO 8601 format
-        const formattedExams = filteredExams.map(exam => ({
+        const formattedExams = filteredExams.map((exam) => ({
           ...exam,
-          openingDate: moment(exam.openingDate, 'MM/DD/YYYY, HH:mm:ss').toISOString(),
-          closingDate: moment(exam.closingDate, 'MM/DD/YYYY, HH:mm:ss').toISOString()
+          openingDate: moment(
+            exam.openingDate,
+            "MM/DD/YYYY, HH:mm:ss"
+          ).toISOString(),
+          closingDate: moment(
+            exam.closingDate,
+            "MM/DD/YYYY, HH:mm:ss"
+          ).toISOString(),
         }));
 
         setExams(formattedExams);
@@ -57,13 +80,15 @@ function SelectExam() {
     const now = moment();
     const openingDate = moment(exam.openingDate);
     const closingDate = moment(exam.closingDate);
-    const sevenDaysAgo = moment().subtract(7, 'days');
+    const sevenDaysAgo = moment().subtract(7, "days");
 
     if (now.isBefore(openingDate)) {
       setModalMessage("This exam is not yet active.");
     } else if (now.isAfter(closingDate)) {
       if (closingDate.isAfter(sevenDaysAgo)) {
-        setModalMessage("This exam is closed and no longer accepting attempts.");
+        setModalMessage(
+          "This exam is closed and no longer accepting attempts."
+        );
       } else {
         return;
       }
@@ -86,37 +111,46 @@ function SelectExam() {
       const examsData = await db.exams.toArray();
       const resultsData = await db.results.toArray();
 
-      const doneExamIDs = resultsData.map(result => result.examID);
+      const doneExamIDs = resultsData.map((result) => result.examID);
 
       // Filter out the exams that have already been done
-      const filteredExams = examsData.filter(exam => !doneExamIDs.includes(exam.examID));
+      const filteredExams = examsData.filter(
+        (exam) => !doneExamIDs.includes(exam.examID)
+      );
 
-      const formattedExams = filteredExams.map(exam => ({
+      const formattedExams = filteredExams.map((exam) => ({
         ...exam,
-        openingDate: moment(exam.openingDate, 'MM/DD/YYYY, HH:mm:ss').toISOString(),
-        closingDate: moment(exam.closingDate, 'MM/DD/YYYY, HH:mm:ss').toISOString()
+        openingDate: moment(
+          exam.openingDate,
+          "MM/DD/YYYY, HH:mm:ss"
+        ).toISOString(),
+        closingDate: moment(
+          exam.closingDate,
+          "MM/DD/YYYY, HH:mm:ss"
+        ).toISOString(),
       }));
       setExams(formattedExams);
     } catch (e) {
-      console.error('Failed to refresh exams:', e);
+      console.error("Failed to refresh exams:", e);
     } finally {
       setRefreshExams(false);
     }
-  }
+  };
 
   const renderExamCard = (exam, index, onClick) => (
     <Col key={index} md={6} lg={4} className="mb-4">
-      <Card
-        className="exam-card"
-        onClick={() => onClick(exam)}
-      >
+      <Card className="exam-card" onClick={() => onClick(exam)}>
         <Card.Body className="text-center">
           <FontAwesomeIcon size="4x" icon={faBookOpen} />
-          <Card.Title className="mt-3">{exam.subjectName.toUpperCase()}</Card.Title>
+          <Card.Title className="mt-3">
+            {exam.subjectName.toUpperCase()}
+          </Card.Title>
           <Card.Text>
             <strong>Exam ID:</strong> {exam.examID} <br />
-            <strong>Opening Date:</strong> {moment(exam.openingDate).format('MM/DD/YYYY, HH:mm:ss')} <br />
-            <strong>Closing Date:</strong> {moment(exam.closingDate).format('MM/DD/YYYY, HH:mm:ss')} <br />
+            <strong>Opening Date:</strong>{" "}
+            {moment(exam.openingDate).format("MM/DD/YYYY, HH:mm:ss")} <br />
+            <strong>Closing Date:</strong>{" "}
+            {moment(exam.closingDate).format("MM/DD/YYYY, HH:mm:ss")} <br />
             <strong>Duration:</strong> {exam.durationMINS} mins
           </Card.Text>
         </Card.Body>
@@ -134,13 +168,24 @@ function SelectExam() {
         <Card.Body>
           <Card.Title>Exams not Available</Card.Title>
           <Card.Text>
-            It looks like you have no exam today. Continue reading your books for your future exams to come. Good luck!
+            It looks like you have no exam today. Continue reading your books
+            for your future exams to come. Good luck!
           </Card.Text>
         </Card.Body>
-        <Card.Footer className="text-muted">Need help? Talk with your class teacher or computer lab teacher.</Card.Footer>
+        <Card.Footer className="text-muted">
+          Need help? Talk with your class teacher or computer lab teacher.
+        </Card.Footer>
       </Card>
-      <Button variant="outline-success" onClick={refreshExams} disabled={isRefreshExams}>
-        {isRefreshExams ? <Spinner animation="border" size="sm" /> : <FontAwesomeIcon icon={faRefresh} className="me-2" />}
+      <Button
+        variant="outline-success"
+        onClick={refreshExams}
+        disabled={isRefreshExams}
+      >
+        {isRefreshExams ? (
+          <Spinner animation="border" size="sm" />
+        ) : (
+          <FontAwesomeIcon icon={faRefresh} className="me-2" />
+        )}
         Refresh Exams
       </Button>
     </>
@@ -148,13 +193,13 @@ function SelectExam() {
 
   const categorizeExams = () => {
     const now = moment();
-    const sevenDaysAgo = moment().subtract(7, 'days');
+    const sevenDaysAgo = moment().subtract(7, "days");
 
     const activeAndOpen = [];
     const notYetActive = [];
     const closedExams = [];
 
-    exams.forEach(exam => {
+    exams.forEach((exam) => {
       const openingDate = moment(exam.openingDate);
       const closingDate = moment(exam.closingDate);
 
@@ -162,7 +207,10 @@ function SelectExam() {
         activeAndOpen.push(exam);
       } else if (now.isBefore(openingDate)) {
         notYetActive.push(exam);
-      } else if (now.isAfter(closingDate) && closingDate.isAfter(sevenDaysAgo)) {
+      } else if (
+        now.isAfter(closingDate) &&
+        closingDate.isAfter(sevenDaysAgo)
+      ) {
         closedExams.push(exam);
       }
     });
@@ -179,8 +227,16 @@ function SelectExam() {
           <Loader />
         ) : (
           <>
-            <Button variant="outline-success" onClick={refreshExams} disabled={isRefreshExams}>
-              {isRefreshExams ? <Spinner animation="border" size="m" /> : <FontAwesomeIcon icon={faRefresh} className="me-2" />}
+            <Button
+              variant="outline-success"
+              onClick={refreshExams}
+              disabled={isRefreshExams}
+            >
+              {isRefreshExams ? (
+                <Spinner animation="border" size="m" />
+              ) : (
+                <FontAwesomeIcon icon={faRefresh} className="me-2" />
+              )}
               Refresh Exams
             </Button>
 
@@ -189,23 +245,21 @@ function SelectExam() {
                 <h4>Active and Open Exams</h4>
               </Card.Header>
               <Card.Body>
-
-                {
-                  activeAndOpen.length > 0 ?
-                    (
-                      <>
-                        <Row className="subject-row">
-                          {activeAndOpen.map((exam, index) => renderExamCard(exam, index, handleCardClick))}
-                        </Row>
-                      </>
-                    )
-                    :
-                    <>
-                      <Alert variant='info'>
-                        No Open and Active Exams Currently.
-                      </Alert>
-                    </>
-                }
+                {activeAndOpen.length > 0 ? (
+                  <>
+                    <Row className="subject-row">
+                      {activeAndOpen.map((exam, index) =>
+                        renderExamCard(exam, index, handleCardClick)
+                      )}
+                    </Row>
+                  </>
+                ) : (
+                  <>
+                    <Alert variant="info">
+                      No Open and Active Exams Currently.
+                    </Alert>
+                  </>
+                )}
               </Card.Body>
             </Card>
 
@@ -214,20 +268,19 @@ function SelectExam() {
                 <h4>Future Exams</h4>
               </Card.Header>
               <Card.Body>
-                {notYetActive.length > 0 ?
-                  (
-                    <>
-                      <Row className="subject-row">
-                        {notYetActive.map((exam, index) => renderExamCard(exam, index, handleCardClick))}
-                      </Row>
-                    </>
-                  )
-                  :
+                {notYetActive.length > 0 ? (
                   <>
-                    <Alert variant='info'>
-                      No Future Exams Available.
-                    </Alert>
-                  </>}
+                    <Row className="subject-row">
+                      {notYetActive.map((exam, index) =>
+                        renderExamCard(exam, index, handleCardClick)
+                      )}
+                    </Row>
+                  </>
+                ) : (
+                  <>
+                    <Alert variant="info">No Future Exams Available.</Alert>
+                  </>
+                )}
               </Card.Body>
             </Card>
 
@@ -245,9 +298,11 @@ function SelectExam() {
               </Card.Body>
             </Card> */}
 
-            {activeAndOpen.length === 0 && notYetActive.length === 0 && closedExams.length === 0 && (
-              <>{examsNotAvailableNotification()}</>
-            )}
+            {activeAndOpen.length === 0 &&
+              notYetActive.length === 0 &&
+              closedExams.length === 0 && (
+                <>{examsNotAvailableNotification()}</>
+              )}
 
             <Modal
               show={selectedExam !== null && modalMessage !== ""}
@@ -282,14 +337,34 @@ function SelectExam() {
               centered
             >
               <Modal.Header closeButton>
-                <Modal.Title>{selectedExam?.subjectName.toUpperCase()} Exam</Modal.Title>
+                <Modal.Title>
+                  {selectedExam?.subjectName.toUpperCase()} Exam
+                </Modal.Title>
               </Modal.Header>
               <Modal.Body>
-                <p><strong>Exam ID:</strong> {selectedExam?.examID}</p>
-                {selectedExam?.description && (<p><strong>Description:</strong> {selectedExam?.description}</p>)}
-                <p><strong>Opening Date:</strong> {moment(selectedExam?.openingDate).format('MM/DD/YYYY, HH:mm:ss')}</p>
-                <p><strong>Closing Date:</strong> {moment(selectedExam?.closingDate).format('MM/DD/YYYY, HH:mm:ss')}</p>
-                <p><strong>Duration:</strong> {selectedExam?.durationMINS} mins</p>
+                <p>
+                  <strong>Exam ID:</strong> {selectedExam?.examID}
+                </p>
+                {selectedExam?.description && (
+                  <p>
+                    <strong>Description:</strong> {selectedExam?.description}
+                  </p>
+                )}
+                <p>
+                  <strong>Opening Date:</strong>{" "}
+                  {moment(selectedExam?.openingDate).format(
+                    "MM/DD/YYYY, HH:mm:ss"
+                  )}
+                </p>
+                <p>
+                  <strong>Closing Date:</strong>{" "}
+                  {moment(selectedExam?.closingDate).format(
+                    "MM/DD/YYYY, HH:mm:ss"
+                  )}
+                </p>
+                <p>
+                  <strong>Duration:</strong> {selectedExam?.durationMINS} mins
+                </p>
               </Modal.Body>
               <Modal.Footer>
                 <Button
@@ -301,7 +376,7 @@ function SelectExam() {
                 <Button
                   onClick={handleStartExam}
                   style={{
-                    backgroundColor: "rgb(6, 63, 90)"
+                    backgroundColor: "rgb(6, 63, 90)",
                   }}
                 >
                   Start Exam

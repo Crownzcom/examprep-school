@@ -36,9 +36,13 @@ function Exam({ examID }) {
       const fetchData = async () => {
         try {
           let questionData = await getSelectedExam(examID);
+          console.log("Question Data:", questionData);
 
           setSubject(questionData.subjectName);
-          if (!questionData.examQuestions || JSON.parse(questionData.examQuestions).length < 1) {
+          if (
+            !questionData.examQuestions ||
+            JSON.parse(questionData.examQuestions).length < 1
+          ) {
             navigate(-1);
             console.log("no exam found");
             return;
@@ -54,11 +58,15 @@ function Exam({ examID }) {
     }
 
     // Cleanup function
-    return () => { };
+    return () => {};
   }, [examID, navigate, examDone]); // Dependency array ensures the code runs only once when examID changes
 
   const handleProceed = () => {
-    if (["social_studies", "mathematics", "english_language", "science"].includes(subject)) {
+    if (
+      ["social_studies", "mathematics", "english_language", "science"].includes(
+        subject
+      )
+    ) {
       setShowInstructionsModal(false);
     } else {
       setShowInstructionsModal(false);
@@ -71,13 +79,22 @@ function Exam({ examID }) {
   };
 
   const renderQuizContent = () => {
-    return <QuizContainer questionsData={data} subjectName={subject} examID={examID} />;
+    return (
+      <QuizContainer
+        questionsData={data}
+        subjectName={subject}
+        examID={examID}
+      />
+    );
   };
 
   const subjectInstructions = () => {
     return subject === "mathematics" ? (
       <>
-        <li>Have a piece of paper, pen/pencil, and calculator ready for calculations.</li>
+        <li>
+          Have a piece of paper, pen/pencil, and calculator ready for
+          calculations.
+        </li>
       </>
     ) : (
       <></>
@@ -86,16 +103,19 @@ function Exam({ examID }) {
 
   const handleCloseExamDoneModal = () => {
     setShowExamDoneModal(false);
-    navigate('/exam-page');
+    navigate("/exam-page");
   };
 
   return (
     <>
       {/* Render the exam if all the consitions are fullfiled */}
-      {!examDone && !showInstructionsModal && !showUnavailableModal && renderQuizContent()}
+      {!examDone &&
+        !showInstructionsModal &&
+        !showUnavailableModal &&
+        renderQuizContent()}
 
       {/* Modal to display the exam instructions */}
-      <Modal show={showInstructionsModal} onHide={() => { }} centered>
+      <Modal show={showInstructionsModal} onHide={() => {}} centered>
         <Modal.Header>
           <Modal.Title>Exam Instructions</Modal.Title>
         </Modal.Header>
@@ -107,11 +127,19 @@ function Exam({ examID }) {
             {/* Other General instructions as needed */}
             <li>Read each question carefully.</li>
             <li>Ensure you answer all questions.</li>
-            <li>Answer multiple-choice questions by selecting the best option.</li>
-            <li>Enter text responses for text entry questions in the provided text box.</li>
+            <li>
+              Answer multiple-choice questions by selecting the best option.
+            </li>
+            <li>
+              Enter text responses for text entry questions in the provided text
+              box.
+            </li>
             <li>Keep track of the time limit and pace yourself accordingly.</li>
             <li>Do not refresh the page during the exam.</li>
-            <li>Upon completion, submit the exam and await feedback on your performance.</li>
+            <li>
+              Upon completion, submit the exam and await feedback on your
+              performance.
+            </li>
           </ul>
         </Modal.Body>
         <Modal.Footer>
@@ -126,12 +154,15 @@ function Exam({ examID }) {
 
       {/* Modal to show exam is unavailable */}
       {showUnavailableModal && (
-        <Modal show={true} onHide={() => { }} centered>
+        <Modal show={true} onHide={() => {}} centered>
           <Modal.Header>
             <Modal.Title>Exam Unavailable</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <p>Currently, the exam for the selected subject is not available. Please check back later.</p>
+            <p>
+              Currently, the exam for the selected subject is not available.
+              Please check back later.
+            </p>
           </Modal.Body>
           <Modal.Footer>
             <Button variant="primary" onClick={handleCancel}>
@@ -142,7 +173,11 @@ function Exam({ examID }) {
       )}
 
       {/* Exam Done Modal */}
-      <Modal show={showExamDoneModal} onHide={handleCloseExamDoneModal} centered>
+      <Modal
+        show={showExamDoneModal}
+        onHide={handleCloseExamDoneModal}
+        centered
+      >
         <Modal.Header closeButton>
           <Modal.Title>Exam Already Done</Modal.Title>
         </Modal.Header>

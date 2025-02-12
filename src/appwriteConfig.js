@@ -1,6 +1,14 @@
 // appwriteConfig.js
-import { Client, Account, Databases, Permission, Role, Query, ID } from "appwrite";
-import db from './db.js';
+import {
+  Client,
+  Account,
+  Databases,
+  Permission,
+  Role,
+  Query,
+  ID,
+} from "appwrite";
+import db from "./db.js";
 
 /**
  * =================================================================
@@ -8,6 +16,7 @@ import db from './db.js';
  * =================================================================
  */
 const appwriteDataArray = await db.appwriteData.toArray(); // Fetch all entries from the appwriteData table
+console.log("Appwrite Data Array: ", appwriteDataArray);
 
 // Handle the case where appwriteData might be null or undefined
 if (appwriteDataArray.length === 0) {
@@ -17,15 +26,15 @@ if (appwriteDataArray.length === 0) {
 const data = appwriteDataArray[0]; // Assuming there's only one entry in the table
 
 const appwriteData = {
-  APPWRITE_ENDPOINT: data?.endpoint ?? '',
-  APPWRITE_PROJECT_ID: data?.project_Id ?? '',
-  DATABASE_ID: data?.database_id ?? '',
-  STUDENT_TABLE_ID: data?.studentTable_id ?? '',
-  STUDENT_RESULTS_TABLE_ID: data?.studentMarksTable_id ?? '',
-  SET_EXAMS_TABLE_ID: data?.examsTable_id ?? '',
-  CLASSES_TABLE_ID: data?.classesTable_id ?? '',
-  SUBJECTS_TABLE_ID: data?.subjectsTable_id ?? '',
-  SCHOOL_TABLE_ID: data?.schoolTable_id ?? '',
+  APPWRITE_ENDPOINT: data?.endpoint ?? "",
+  APPWRITE_PROJECT_ID: data?.project_Id ?? "",
+  DATABASE_ID: data?.database_id ?? "",
+  STUDENT_TABLE_ID: data?.studentTable_id ?? "",
+  STUDENT_RESULTS_TABLE_ID: data?.studentMarksTable_id ?? "",
+  SET_EXAMS_TABLE_ID: data?.examsTable_id ?? "",
+  CLASSES_TABLE_ID: data?.classesTable_id ?? "",
+  SUBJECTS_TABLE_ID: data?.subjectsTable_id ?? "",
+  SCHOOL_TABLE_ID: data?.schoolTable_id ?? "",
   // Add the other fields as necessary
 };
 
@@ -42,8 +51,7 @@ const {
   SUBJECTS_TABLE_ID,
   SCHOOL_TABLE_ID,
   // Add the other fields as necessary
-} = appwriteDataDestructured
-
+} = appwriteDataDestructured;
 
 /**
  * =================================================================
@@ -55,8 +63,8 @@ const {
 //   .setProject(APPWRITE_PROJECT_ID)
 
 const client = new Client()
-  .setEndpoint('https://appwrite.exampreptutor.com/v1')
-  .setProject('66ac8ccd001f073c0692')
+  .setEndpoint("https://appwrite.exampreptutor.com/v1")
+  .setProject("66ac8ccd001f073c0692");
 
 const account = new Account(client);
 const databases = new Databases(client);
@@ -64,16 +72,16 @@ const databases = new Databases(client);
 const database_id = DATABASE_ID;
 const studentTable_id = STUDENT_TABLE_ID;
 const studentMarksTable_id = STUDENT_RESULTS_TABLE_ID;
-const subjectsTable_id = SUBJECTS_TABLE_ID
-const examsTable_id = SET_EXAMS_TABLE_ID
-const classesTable_id = CLASSES_TABLE_ID
-const schoolTable_id = SCHOOL_TABLE_ID
-const couponTable_id = ""
-const transactionTable_id = ""
-const pointsTable_id = ''
-const pointsBatchTable_id = ''
-const couponUsagesTable_id = ''
-const updatedAttemptedQtnsTable_id = ''
+const subjectsTable_id = SUBJECTS_TABLE_ID;
+const examsTable_id = SET_EXAMS_TABLE_ID;
+const classesTable_id = CLASSES_TABLE_ID;
+const schoolTable_id = SCHOOL_TABLE_ID;
+const couponTable_id = "";
+const transactionTable_id = "";
+const pointsTable_id = "";
+const pointsBatchTable_id = "";
+const couponUsagesTable_id = "";
+const updatedAttemptedQtnsTable_id = "";
 const nextOfKinTable_id = "";
 
 // Export the required parts
@@ -98,5 +106,5 @@ export {
   Permission,
   Role,
   Query,
-  ID
+  ID,
 };
