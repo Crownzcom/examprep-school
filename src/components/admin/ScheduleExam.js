@@ -14,6 +14,7 @@ import {
 import { useAuth } from "../../context/AuthContext";
 import db from "../../db";
 import moment from "moment-timezone";
+import { useNavigate } from "react-router-dom";
 
 const ScheduleExam = () => {
   const { userInfo } = useAuth();
@@ -27,6 +28,8 @@ const ScheduleExam = () => {
   const [endDate, setEndDate] = useState(null);
   const [duration, setDuration] = useState("");
   const [error, setError] = useState("");
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchClasses = async () => {
@@ -124,6 +127,7 @@ const ScheduleExam = () => {
           examSetData
         );
         console.log("exam saved successfully", saveResponse);
+        navigate("/");
       } catch (e) {
         console.log(
           "Failed to save Exam Set Data to Appwrite Database Collection: ",
