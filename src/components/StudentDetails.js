@@ -10,7 +10,7 @@ import {
   Tabs,
   Tab,
   Button,
-  Badge
+  Badge,
 } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -27,7 +27,13 @@ import {
   faPaperPlane,
   faCoins,
   faPen,
-  faCircleArrowUp
+  faCircleArrowUp,
+  faEquals,
+  faChartBar,
+  faUser,
+  faPercent,
+  faMedal,
+  faTrophy,
 } from "@fortawesome/free-solid-svg-icons";
 
 const StudentDetails = () => {
@@ -51,10 +57,11 @@ const StudentDetails = () => {
   function viewResults(resultDetails, subjectName, totalMarks) {
     if (subjectName === "English Language") {
       navigate("/exam-results", { state: { results: resultDetails } });
-    }
-    else {
+    } else {
       const questionsData = JSON.parse(resultDetails);
-      navigate('/answers', { state: { questionsData, subjectName, totalMarks } });
+      navigate("/answers", {
+        state: { questionsData, subjectName, totalMarks },
+      });
     }
   }
 
@@ -97,8 +104,7 @@ const StudentDetails = () => {
                         icon={faGraduationCap}
                         className="me-2"
                       />
-                      <strong>Stream:</strong>{" "}
-                      {displayValue(student.stream)}
+                      <strong>Stream:</strong> {displayValue(student.stream)}
                     </ListGroup.Item>
                   </ListGroup>
                 </Card.Body>
@@ -141,7 +147,13 @@ const StudentDetails = () => {
                         <Button
                           variant="primary"
                           size="sm"
-                          onClick={() => viewResults(result.resultDetails, result.subject, result.score)}
+                          onClick={() =>
+                            viewResults(
+                              result.resultDetails,
+                              result.subject,
+                              result.score
+                            )
+                          }
                         >
                           Exam Results
                         </Button>
@@ -150,6 +162,47 @@ const StudentDetails = () => {
                   ))}
                 </tbody>
               </Table>
+            </Tab>
+
+            <Tab eventKey="report" title="Report Card">
+              <Card className="mb-4" bg="light">
+                <Card.Body>
+                  <Card.Title>
+                    <FontAwesomeIcon icon={faBookOpen} className="me-2" />
+                    {student.studName}'s Data Analysis
+                  </Card.Title>
+                  <ListGroup variant="flush">
+                    <ListGroup.Item>
+                      <FontAwesomeIcon icon={faUser} className="me-2" />
+                      <strong>Name:</strong> {displayValue(student.studName)}
+                    </ListGroup.Item>
+                    <ListGroup.Item>
+                      <FontAwesomeIcon icon={faEquals} className="me-2" />
+                      <strong>Points:</strong> {displayValue(student.gender)}
+                    </ListGroup.Item>
+                    <ListGroup.Item>
+                      <FontAwesomeIcon icon={faPercent} className="me-2" />
+                      <strong>Exam Mean Mark:</strong>{" "}
+                      {displayValue(student.userID)}
+                    </ListGroup.Item>
+                    <ListGroup.Item>
+                      <FontAwesomeIcon icon={faChartBar} className="me-2" />
+                      <strong>Exam Average Points</strong>{" "}
+                      {displayValue(student.studClass)}
+                    </ListGroup.Item>
+                    <ListGroup.Item>
+                      <FontAwesomeIcon icon={faTrophy} className="me-2" />
+                      <strong>Overall Position</strong>{" "}
+                      {displayValue(student.stream)}
+                    </ListGroup.Item>
+                    <ListGroup.Item>
+                      <FontAwesomeIcon icon={faMedal} className="me-2" />
+                      <strong>Stream Position</strong>{" "}
+                      {displayValue(student.stream)}
+                    </ListGroup.Item>
+                  </ListGroup>
+                </Card.Body>
+              </Card>
             </Tab>
           </Tabs>
         </Col>

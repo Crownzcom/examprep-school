@@ -149,7 +149,7 @@ function Home() {
                       <Card.Header as="h5">Additional Feature</Card.Header>
                       <Card.Body>
                         <Card.Text>More developer features here.</Card.Text>
-                        <Button variant="outline-primary" onClick={testFunc2}>
+                        <Button variant="outline-secondary" onClick={testFunc2}>
                           Activate Feature
                         </Button>
                       </Card.Body>
