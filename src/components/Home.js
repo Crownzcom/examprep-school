@@ -2,8 +2,22 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEdit, faUserCircle, faCoins, faArrowUp, faArrowCircleUp } from "@fortawesome/free-solid-svg-icons";
-import { Container, Row, Col, Button, Alert, Badge, Card } from "react-bootstrap";
+import {
+  faEdit,
+  faUserCircle,
+  faCoins,
+  faArrowUp,
+  faArrowCircleUp,
+} from "@fortawesome/free-solid-svg-icons";
+import {
+  Container,
+  Row,
+  Col,
+  Button,
+  Alert,
+  Badge,
+  Card,
+} from "react-bootstrap";
 import { useAuth } from "../context/AuthContext";
 import "../animations.css";
 import HeroHeader from "./HeroHeader";
@@ -18,7 +32,7 @@ function Home() {
   // const userInfo = storageUtil.getItem("userInfo");
   const isStudent = userInfo.userType === "student";
   const isAdmin = userInfo.userType === "admin";
-  const isDev = userInfo.userType === "dev"
+  const isDev = userInfo.userType === "dev";
 
   /*======== TESTING ONLY =================================*/
   //FETCH EXAMS AND SAVE IN INDEX DB
@@ -27,7 +41,7 @@ function Home() {
       try {
         // await updateQuestionSubjectData(userInfo.subjects, userInfo.userId, userInfo.educationLevel)
       } catch (error) {
-        console.error('Failed to save qtns to index db: ', error);
+        console.error("Failed to save qtns to index db: ", error);
       }
     };
     fetchExams();
@@ -36,31 +50,38 @@ function Home() {
   const testFunc = async () => {
     //Fetch all students data
     console.log("Checking whether user is an admin or staff");
-    if (userInfo.userType === 'admin' || userInfo.userType === "dev") {
-      console.log('Fetching student data');
-      await fetchStudents().then(data => {
-        console.log('Students data Fetch successfully');
-      }).catch(error => {
-        console.error('Failed to fetch students');
-      });
+    if (userInfo.userType === "admin" || userInfo.userType === "dev") {
+      console.log("Fetching student data");
+      await fetchStudents()
+        .then((data) => {
+          console.log("Students data Fetch successfully");
+        })
+        .catch((error) => {
+          console.error("Failed to fetch students");
+        });
     }
-  }
+  };
 
   const testFunc2 = async () => {
     //saving qtns to db
-    if (userInfo.userType === 'student') {
+    if (userInfo.userType === "student") {
       try {
-        await updateQuestionSubjectData(userInfo.subjects, userInfo.userId, userInfo.educationLevel)
+        await updateQuestionSubjectData(
+          userInfo.subjects,
+          userInfo.userId,
+          userInfo.educationLevel
+        );
+        alert("Feature yet to be implemented");
       } catch (error) {
-        console.error('Failed to save qtns to index db: ', error);
+        console.error("Failed to save qtns to index db: ", error);
       }
     }
-  }
+  };
 
   const testFunc3 = async () => {
     //navigate to signup page
-    navigate('/create-account')
-  }
+    navigate("/create-account");
+  };
   /*==============================================================*/
 
   const renderHeroHeader = () => (
@@ -94,9 +115,28 @@ function Home() {
                   <div className="col-md-4 mb-4">
                     <Card className="text-center">
                       <Card.Body>
-                        <Button variant="outline-primary" onClick={() => navigate('/schedule-exam')}>
-                          <FontAwesomeIcon icon={faArrowCircleUp} className="me-2" />
+                        <Button
+                          variant="outline-primary"
+                          onClick={() => navigate("/schedule-exam")}
+                        >
+                          <FontAwesomeIcon
+                            icon={faArrowCircleUp}
+                            className="me-2"
+                          />
                           Schedule Exam
+                        </Button>
+                      </Card.Body>
+                    </Card>
+                  </div>
+                  <div className="col-md-4 mb-4">
+                    <Card className="text-center">
+                      <Card.Body>
+                        <Button variant="outline-primary" onClick={testFunc3}>
+                          <FontAwesomeIcon
+                            icon={faArrowCircleUp}
+                            className="me-2"
+                          />
+                          Sign-Up Users
                         </Button>
                       </Card.Body>
                     </Card>
@@ -109,8 +149,9 @@ function Home() {
                       <Card.Header as="h5">Additional Feature</Card.Header>
                       <Card.Body>
                         <Card.Text>More developer features here.</Card.Text>
-                        <Button variant="outline-secondary" onClick={testFunc3}>Sign-Up Users</Button>
-                        <Button variant="outline-secondary" onClick={testFunc2}>Activate Feature</Button>
+                        <Button variant="outline-primary" onClick={testFunc2}>
+                          Activate Feature
+                        </Button>
                       </Card.Body>
                     </Card>
                   </div>
@@ -121,7 +162,10 @@ function Home() {
           {isStudent && (
             <>
               <Col md="auto">
-                <Button variant="secondary" onClick={() => navigate("/exam-page")}>
+                <Button
+                  variant="secondary"
+                  onClick={() => navigate("/exam-page")}
+                >
                   <FontAwesomeIcon icon={faEdit} /> Attempt Exam
                 </Button>
               </Col>
@@ -133,8 +177,14 @@ function Home() {
                       <div className="col-md-4 mb-4">
                         <Card className="text-center">
                           <Card.Body>
-                            <Button variant="outline-primary" onClick={() => testFunc()}>
-                              <FontAwesomeIcon icon={faArrowCircleUp} className="me-2" />
+                            <Button
+                              variant="outline-primary"
+                              onClick={() => testFunc()}
+                            >
+                              <FontAwesomeIcon
+                                icon={faArrowCircleUp}
+                                className="me-2"
+                              />
                               Initiate IndexDB
                             </Button>
                           </Card.Body>
@@ -148,7 +198,12 @@ function Home() {
                           <Card.Header as="h5">Additional Feature</Card.Header>
                           <Card.Body>
                             <Card.Text>More developer features here.</Card.Text>
-                            <Button variant="outline-secondary" onClick={testFunc2}>Activate Feature</Button>
+                            <Button
+                              variant="outline-secondary"
+                              onClick={testFunc2}
+                            >
+                              Activate Feature
+                            </Button>
                           </Card.Body>
                         </Card>
                       </div>
@@ -156,7 +211,6 @@ function Home() {
                   </>
                 )}
               </div>
-
             </>
           )}
         </Row>
@@ -168,12 +222,12 @@ function Home() {
     <>
       {renderHeroHeader()}
       <Container fluid>
-        {isAdmin ? <AdminDashboard /> :
-          <>
-            {isStudent && <StudentDashboard />}
-          </>
-        }
-      </Container >
+        {isAdmin ? (
+          <AdminDashboard />
+        ) : (
+          <>{isStudent && <StudentDashboard />}</>
+        )}
+      </Container>
     </>
   );
 }
