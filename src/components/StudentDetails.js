@@ -34,6 +34,8 @@ import {
   faPercent,
   faMedal,
   faTrophy,
+  faAward,
+  faChartLine,
 } from "@fortawesome/free-solid-svg-icons";
 
 const StudentDetails = () => {
@@ -64,6 +66,8 @@ const StudentDetails = () => {
       });
     }
   }
+
+  console.log("Student details: ", student);
 
   return (
     <Container className="mt-5" style={{ marginTop: "100px" }}>
@@ -169,7 +173,7 @@ const StudentDetails = () => {
                 <Card.Body>
                   <Card.Title>
                     <FontAwesomeIcon icon={faBookOpen} className="me-2" />
-                    {student.studName}'s Data Analysis
+                    {student.studName}'s Metrics
                   </Card.Title>
                   <ListGroup variant="flush">
                     <ListGroup.Item>
@@ -191,12 +195,12 @@ const StudentDetails = () => {
                       {displayValue(student.studClass)}
                     </ListGroup.Item>
                     <ListGroup.Item>
-                      <FontAwesomeIcon icon={faTrophy} className="me-2" />
+                      <FontAwesomeIcon icon={faChartLine} className="me-2" />
                       <strong>Overall Position</strong>{" "}
                       {displayValue(student.stream)}
                     </ListGroup.Item>
                     <ListGroup.Item>
-                      <FontAwesomeIcon icon={faMedal} className="me-2" />
+                      <FontAwesomeIcon icon={faAward} className="me-2" />
                       <strong>Stream Position</strong>{" "}
                       {displayValue(student.stream)}
                     </ListGroup.Item>
