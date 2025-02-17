@@ -54,4 +54,24 @@ export const calculateOverallPosition = (students, studClass) => {
         : null,
   }));
 };
-// function to calculate the position of a student in a stream
+
+// Calculate Stream Position (Ranking Within the Stream)
+export const calculateStreamPosition = (students, studClass, stream) => {
+  // Filter students by class and stream
+  const studentsInStream = students.filter(
+    (student) => student.studClass === studClass && student.stream === stream
+  );
+
+  // Sort by total points in descending order
+  const sortedStudents = [...studentsInStream].sort(
+    (a, b) => calculateTotalPoints(b) - calculateTotalPoints(a)
+  );
+
+  return students.map((student) => ({
+    ...student,
+    streamPosition:
+      student.studClass === studClass && student.stream === stream
+        ? sortedStudents.findIndex((s) => s.userID === student.userID) + 1
+        : null,
+  }));
+};
