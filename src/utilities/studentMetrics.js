@@ -23,7 +23,16 @@ export const calculateExamMeanMark = (student) => {
     : 0;
 };
 
-// function to calculate the average mark of a student
+// Calculate Average Points (Sum of Marks / Number of Subjects)
+export const calculateAveragePoints = (student) => {
+  if (!student.Results || student.Results.length === 0) return 0;
+
+  const totalMarks = student.Results.reduce(
+    (sum, exam) => sum + (exam.marks || 0),
+    0
+  );
+  return (totalMarks / student.Results.length).toFixed(2);
+};
 
 // function to calculate the overall position of a student
 
