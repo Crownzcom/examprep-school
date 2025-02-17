@@ -5,12 +5,22 @@ export const calculateTotalPoints = (student) => {
   return student.Results.reduce((total, result) => total + result.marks, 0);
 };
 
-// function to calculate the exam mean mark of a student
-export const calculateMeanMark = (student) => {
+// Calculate Mean Mark in Percentage (Total Marks / Total Possible Marks * 100)
+export const calculateExamMeanMark = (student) => {
   if (!student.Results || student.Results.length === 0) return 0;
 
-  const totalPoints = calculateTotalPoints(student);
-  return (totalPoints / student.Results.length).toFixed(2);
+  const totalMarks = student.Results.reduce(
+    (sum, exam) => sum + (exam.marks || 0),
+    0
+  );
+  const totalPossibleMarks = student.Results.reduce(
+    (sum, exam) => sum + (exam.finalPossibleMarks || 0),
+    0
+  );
+
+  return totalPossibleMarks > 0
+    ? ((totalMarks / totalPossibleMarks) * 100).toFixed(2)
+    : 0;
 };
 
 // function to calculate the average mark of a student
