@@ -34,6 +34,24 @@ export const calculateAveragePoints = (student) => {
   return (totalMarks / student.Results.length).toFixed(2);
 };
 
-// function to calculate the overall position of a student
+// Calculate Overall Position in Class (All Streams Combined)
+export const calculateOverallPosition = (students, studClass) => {
+  // Filter students by class
+  const studentsInClass = students.filter(
+    (student) => student.studClass === studClass
+  );
 
+  // Sort by total points in descending order
+  const sortedStudents = [...studentsInClass].sort(
+    (a, b) => calculateTotalPoints(b) - calculateTotalPoints(a)
+  );
+
+  return students.map((student) => ({
+    ...student,
+    overallPosition:
+      student.studClass === studClass
+        ? sortedStudents.findIndex((s) => s.userID === student.userID) + 1
+        : null,
+  }));
+};
 // function to calculate the position of a student in a stream
