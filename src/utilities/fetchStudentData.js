@@ -419,7 +419,7 @@ export const fetchAndProcessStudentData = async () => {
       .then((data) => {
         // console.log(data); // This logs the data retrieved from the server
 
-        // console.log('Processed Data: ', data.data)
+        console.log("Processed Data: ", data.data);
 
         // Step 3: Save the processed data to local storage using storageUtil
         storageUtil.setItem("studentData", data.data);
