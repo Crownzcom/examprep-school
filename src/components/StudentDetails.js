@@ -38,6 +38,14 @@ import {
   faChartLine,
 } from "@fortawesome/free-solid-svg-icons";
 
+import {
+  calculateAveragePoints,
+  calculateExamMeanMark,
+  calculateOverallPosition,
+  calculateStreamPosition,
+  calculateTotalPoints,
+} from "../utilities/studentMetrics";
+
 const StudentDetails = () => {
   const navigate = useNavigate();
   const location = useLocation();
