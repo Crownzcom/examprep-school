@@ -86,7 +86,7 @@ const AdminDashboard = () => {
                 number: inactiveCount,
               },
               {
-                title: "Examination Anaylsis",
+                title: "Examination Analysis",
                 icon: faBarChart,
                 borderColor: "#008080",
                 link: "/exams-stats",
