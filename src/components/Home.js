@@ -144,7 +144,7 @@ function Home() {
 
                   {/* Additional cards can be added here following the same pattern */}
                   {/* Example additional card */}
-                  <div className="col-md-4 mb-4">
+                  {/* <div className="col-md-4 mb-4">
                     <Card className="text-center">
                       <Card.Header as="h5">Additional Feature</Card.Header>
                       <Card.Body>
@@ -154,7 +154,7 @@ function Home() {
                         </Button>
                       </Card.Body>
                     </Card>
-                  </div>
+                  </div> */}
                 </div>
               </>
             )}

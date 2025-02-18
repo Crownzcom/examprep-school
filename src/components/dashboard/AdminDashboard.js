@@ -10,8 +10,10 @@ import {
   faCheckCircle,
   faTimesCircle,
   faBan,
+  faBarChart,
 } from "@fortawesome/free-solid-svg-icons";
 import db from "../../db"; // Import the database configuration
+import { icon } from "@fortawesome/fontawesome-svg-core";
 
 const AdminDashboard = () => {
   const [key, setKey] = useState("students");
@@ -61,7 +63,6 @@ const AdminDashboard = () => {
             className="justify-content-md-center"
             style={{ marginTop: "20px", gap: "20px" }}
           >
-            {/* Student Cards */}
             {[
               {
                 title: "Registered Students",
@@ -83,6 +84,12 @@ const AdminDashboard = () => {
                 borderColor: "#20B2AA",
                 link: "/inactive",
                 number: inactiveCount,
+              },
+              {
+                title: "Examination Anaylsis",
+                icon: faBarChart,
+                borderColor: "#008080",
+                link: "/exams-stats",
               },
             ].map((card) => (
               <Col md={3} key={card.title}>
