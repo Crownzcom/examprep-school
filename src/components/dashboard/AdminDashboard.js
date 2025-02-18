@@ -51,14 +51,16 @@ const AdminDashboard = () => {
 
   return (
     <Container fluid>
-      <Tabs
+      <div
+        className="mb-4"
         id="controlled-tab-example"
         activeKey={key}
         onSelect={(k) => setKey(k)}
-        className="mb-3"
         variant="pills"
       >
-        <Tab eventKey="students" title="Students">
+        <div eventKey="students" title="Students">
+          <h5 className="title-2">Metrics: Students & Exams</h5>
+
           <Row
             className="justify-content-md-center"
             style={{ marginTop: "20px", gap: "20px" }}
@@ -100,8 +102,8 @@ const AdminDashboard = () => {
               </Col>
             ))}
           </Row>
-        </Tab>
-      </Tabs>
+        </div>
+      </div>
     </Container>
   );
 };
