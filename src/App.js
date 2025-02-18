@@ -31,12 +31,13 @@ import LinkedStudents from "./components/LinkedStudents";
 import EditProfile from "./components/EditProfile";
 import Answers from "./components/renderAnswer/Answers";
 import RegisteredStudents from "./pages/RegisteredStudents";
-import ScheduleExam from "./components/scheduleExam/ScheduleExam.js"
-import NotFoundPage from './components/NotFoundPage';
-import CreateAdmin from "./components/initiate/CreateAdmin.js"
-import { AuthProvider, useAuth } from './context/AuthContext';
+import ScheduleExam from "./components/scheduleExam/ScheduleExam.js";
+import NotFoundPage from "./components/NotFoundPage";
+import CreateAdmin from "./components/initiate/CreateAdmin.js";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 // import './serviceWorkerListener.js';  // Service worker listener script
 import "./App.css";
+import ExamsStats from "./components/ExamsStats.js";
 
 function PrivateRoute({ children }) {
   const { userInfo, sessionInfo } = useAuth();
@@ -44,7 +45,7 @@ function PrivateRoute({ children }) {
   if (!userInfo || !sessionInfo) {
     // window.location.reload();
     return <Navigate to="/login" />;
-  } else if (window.location.pathname === '/login') {
+  } else if (window.location.pathname === "/login") {
     window.location.reload();
   }
   return children;
@@ -79,24 +80,130 @@ function App() {
           <AppContent />
           <div>
             <Routes>
-              <Route path="/" element={<PrivateRoute><Home /></PrivateRoute>} />
-              <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
-              <Route path="/all-results" element={<PrivateRoute><AllResults /></PrivateRoute>} />
-              <Route path="/exam/:examID" element={<PrivateRoute><ExamWithSubject /></PrivateRoute>} />
-              <Route path="/exam-page" element={<PrivateRoute><ExamPage /></PrivateRoute>} />
-              <Route path="/edit-profile" element={<PrivateRoute><EditProfile /></PrivateRoute>} />
-              <Route path="/exam-results" element={<PrivateRoute><QuizResults /></PrivateRoute>} />
-              <Route path="/student-details" element={<PrivateRoute><StudentDetails /></PrivateRoute>} />
-              <Route path="/linked-students" element={<PrivateRoute><LinkedStudents /></PrivateRoute>} />
-              <Route path="/answers" element={<PrivateRoute><Answers /></PrivateRoute>} />
-              <Route path="/registered-students" element={<PrivateRoute><RegisteredStudents /></PrivateRoute>} />
-              <Route path="/schedule-exam" element={<PrivateRoute><ScheduleExam /></PrivateRoute>} />
+              <Route
+                path="/"
+                element={
+                  <PrivateRoute>
+                    <Home />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/profile"
+                element={
+                  <PrivateRoute>
+                    <Profile />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/all-results"
+                element={
+                  <PrivateRoute>
+                    <AllResults />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/exam/:examID"
+                element={
+                  <PrivateRoute>
+                    <ExamWithSubject />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/exam-page"
+                element={
+                  <PrivateRoute>
+                    <ExamPage />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/edit-profile"
+                element={
+                  <PrivateRoute>
+                    <EditProfile />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/exam-results"
+                element={
+                  <PrivateRoute>
+                    <QuizResults />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/student-details"
+                element={
+                  <PrivateRoute>
+                    <StudentDetails />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/linked-students"
+                element={
+                  <PrivateRoute>
+                    <LinkedStudents />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/answers"
+                element={
+                  <PrivateRoute>
+                    <Answers />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/registered-students"
+                element={
+                  <PrivateRoute>
+                    <RegisteredStudents />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/schedule-exam"
+                element={
+                  <PrivateRoute>
+                    <ScheduleExam />
+                  </PrivateRoute>
+                }
+              />
+              <Route path="/exams-stats" element={<ExamsStats />} />
               <Route path="/initiate" element={<Initiate />} />
               <Route path="/create-admin" element={<CreateAdmin />} />
               <Route path="/login" element={<Login />} />
-              <Route path="/create-account" element={<PrivateRoute><CreateAccount /></PrivateRoute>} />
-              <Route path="/create-account/single" element={<PrivateRoute><SingleAccount /></PrivateRoute>} />
-              <Route path="/create-account/batch" element={<PrivateRoute><BatchAccount /></PrivateRoute>} />
+              <Route
+                path="/create-account"
+                element={
+                  <PrivateRoute>
+                    <CreateAccount />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/create-account/single"
+                element={
+                  <PrivateRoute>
+                    <SingleAccount />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/create-account/batch"
+                element={
+                  <PrivateRoute>
+                    <BatchAccount />
+                  </PrivateRoute>
+                }
+              />
               <Route path="/forget-password" element={<ForgetPassword />} />
               <Route path="/password-reset" element={<PasswordReset />} />
               <Route path="*" element={<NotFoundPage />} />

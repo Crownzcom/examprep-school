@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   Card,
@@ -10,7 +10,6 @@ import {
   Tabs,
   Tab,
   Button,
-  Badge,
 } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -18,22 +17,16 @@ import {
   faBookOpen,
   faClock,
   faPercentage,
-  faSchool,
+  faArrowLeft,
   faVenusMars,
   faPhone,
   faEnvelope,
   faGraduationCap,
-  faMapMarkerAlt,
   faPaperPlane,
-  faCoins,
-  faPen,
-  faCircleArrowUp,
   faEquals,
   faChartBar,
   faUser,
   faPercent,
-  faMedal,
-  faTrophy,
   faAward,
   faChartLine,
 } from "@fortawesome/free-solid-svg-icons";
@@ -45,12 +38,41 @@ import {
   calculateStreamPosition,
   calculateTotalPoints,
 } from "../utilities/studentMetrics";
+import "./../components/StudentDetails.css";
+import db from "../db";
 
 const StudentDetails = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const student = location.state?.student;
   const [key, setKey] = useState("details"); // State to manage active tab key
+  const [students, setStudents] = useState([]);
+
+  // Fetch all students data
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setStudents(await db.students.toArray());
+      } catch (error) {
+        console.error("Failed to fetch students", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  console.log("Students details data: ", students);
+
+  // Get updated rankings for all students in the same class
+  const studentsWithOverall = calculateOverallPosition(
+    students,
+    student.studClass
+  );
+  const studentsWithStream = calculateStreamPosition(
+    students,
+    student.studClass,
+    student.stream
+  );
 
   if (!student) {
     return (
@@ -79,6 +101,11 @@ const StudentDetails = () => {
 
   return (
     <Container className="mt-5" style={{ marginTop: "100px" }}>
+      <button className="back-button" onClick={() => navigate(-1)}>
+        <FontAwesomeIcon icon={faArrowLeft} className="me-2" />
+        Back
+      </button>
+
       <Row>
         <Col md={12}>
           <Tabs
@@ -190,27 +217,35 @@ const StudentDetails = () => {
                     </ListGroup.Item>
                     <ListGroup.Item>
                       <FontAwesomeIcon icon={faEquals} className="me-2" />
-                      <strong>Points:</strong> {displayValue(student.gender)}
+                      <strong>Points:</strong> {calculateTotalPoints(student)}
                     </ListGroup.Item>
                     <ListGroup.Item>
                       <FontAwesomeIcon icon={faPercent} className="me-2" />
-                      <strong>Exam Mean Mark:</strong>{" "}
-                      {displayValue(student.userID)}
+                      <strong>Exam Mean Mark (%):</strong>{" "}
+                      {calculateExamMeanMark(student)}
                     </ListGroup.Item>
                     <ListGroup.Item>
                       <FontAwesomeIcon icon={faChartBar} className="me-2" />
                       <strong>Exam Average Points</strong>{" "}
-                      {displayValue(student.studClass)}
+                      {calculateAveragePoints(student)}
                     </ListGroup.Item>
                     <ListGroup.Item>
                       <FontAwesomeIcon icon={faChartLine} className="me-2" />
                       <strong>Overall Position</strong>{" "}
-                      {displayValue(student.stream)}
+                      {
+                        studentsWithOverall.find(
+                          (s) => s.userID === student.userID
+                        )?.overallPosition
+                      }
                     </ListGroup.Item>
                     <ListGroup.Item>
                       <FontAwesomeIcon icon={faAward} className="me-2" />
                       <strong>Stream Position</strong>{" "}
-                      {displayValue(student.stream)}
+                      {
+                        studentsWithStream.find(
+                          (s) => s.userID === student.userID
+                        )?.streamPosition
+                      }
                     </ListGroup.Item>
                   </ListGroup>
                 </Card.Body>

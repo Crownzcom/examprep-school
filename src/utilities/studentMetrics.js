@@ -1,19 +1,29 @@
 // function to calculate the total points of a student
 export const calculateTotalPoints = (student) => {
-  if (!student.Results || student.Results.length === 0) return 0;
+  if (!student || !student.Results) return 0;
 
-  return student.Results.reduce((total, result) => total + result.marks, 0);
+  // Ensure `Results` is an array by parsing it
+  const results =
+    typeof student.Results === "string"
+      ? JSON.parse(student.Results)
+      : student.Results;
+
+  if (!Array.isArray(results)) return 0; // Ensure it's a valid array
+
+  return results.reduce((sum, exam) => sum + (exam.marks || 0), 0);
 };
 
 // Calculate Mean Mark in Percentage (Total Marks / Total Possible Marks * 100)
 export const calculateExamMeanMark = (student) => {
   if (!student.Results || student.Results.length === 0) return 0;
 
-  const totalMarks = student.Results.reduce(
-    (sum, exam) => sum + (exam.marks || 0),
-    0
-  );
-  const totalPossibleMarks = student.Results.reduce(
+  const results =
+    typeof student.Results === "string"
+      ? JSON.parse(student.Results)
+      : student.Results || [];
+
+  const totalMarks = results.reduce((sum, exam) => sum + (exam.marks || 0), 0);
+  const totalPossibleMarks = results.reduce(
     (sum, exam) => sum + (exam.finalPossibleMarks || 0),
     0
   );
@@ -27,11 +37,13 @@ export const calculateExamMeanMark = (student) => {
 export const calculateAveragePoints = (student) => {
   if (!student.Results || student.Results.length === 0) return 0;
 
-  const totalMarks = student.Results.reduce(
-    (sum, exam) => sum + (exam.marks || 0),
-    0
-  );
-  return (totalMarks / student.Results.length).toFixed(2);
+  const results =
+    typeof student.Results === "string"
+      ? JSON.parse(student.Results)
+      : student.Results || [];
+
+  const totalMarks = results.reduce((sum, exam) => sum + (exam.marks || 0), 0);
+  return (totalMarks / results.length).toFixed(2);
 };
 
 // Calculate Overall Position in Class (All Streams Combined)
