@@ -1,0 +1,113 @@
+.exams-stats-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.selector-container {
+  margin: 15px 0;
+  display: flex;
+  align-items: center;
+}
+
+.selector-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center content horizontally */
+  justify-content: center; /* Center content vertically if needed */
+  text-align: center;
+  margin: 20px auto;
+  padding: 15px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  width: 50%; /* Adjust width */
+  min-width: 300px; /* Ensure it doesn't get too small */
+}
+
+.selector-container label {
+  font-size: 18px;
+  font-weight: bold;
+  color: #343a40;
+  margin-bottom: 10px;
+}
+
+.selector-container select {
+  width: 80%;
+  padding: 8px;
+  font-size: 16px;
+  border-radius: 5px;
+  border: 1px solid #ced4da;
+  background: #f8f9fa;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+.selector-container select:hover {
+  border-color: #007bff;
+}
+
+.selector-container select:focus {
+  outline: none;
+  border-color: #0056b3;
+  box-shadow: 0px 0px 5px rgba(0, 123, 255, 0.5);
+}
+
+.selector-container label {
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+.selector-container select {
+  padding: 5px;
+  border-radius: 5px;
+  border: 1px solid #ced4da;
+}
+
+h3 {
+  text-align: center;
+  color: #007bff;
+}
+
+h5 {
+  font-weight: bold;
+  color: #343a40;
+}
+
+.table {
+  background: white;
+  border-radius: 5px;
+}
+
+.btn-primary {
+  background: #007bff;
+  border: none;
+}
+
+.btn-primary:hover {
+  background: #0056b3;
+}
+
+.graph-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center content horizontally */
+  justify-content: center; /* Center content vertically */
+  text-align: center;
+  margin: 20px auto;
+  width: 60%;
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.graph-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #343a40;
+  margin-bottom: 15px;
+}

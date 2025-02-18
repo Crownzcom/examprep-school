@@ -15,6 +15,7 @@ import {
   Line,
 } from "recharts";
 import { fetchStudents } from "../utilities/fetchStudentData";
+import "../components/ExamsStats.css";
 
 const ExamsStats = () => {
   const [students, setStudents] = useState([]);
@@ -250,20 +251,10 @@ const ExamsStats = () => {
   console.log(classData);
   return (
     <div className="exams-stats-container">
-      <div className="d-flex align-items-center p-2 justify-content-between w-100 m-0">
-        <h3>Examination Stats</h3>
-        <button
-          className="btn btn-primary btn-sm"
-          style={{ width: "auto", margin: "0" }}
-          onClick={handleGoBack}
-        >
-          Back
-        </button>
-      </div>
       <div className="w-100">
         <h4
-          className="d-flex align-items-center bg-success gap-2 p-4"
-          style={{ color: "white", margin: "0" }}
+          className="d-flex align-items-center gap-2 p-4"
+          style={{ margin: "0" }}
         >
           <Icon icon="game-icons:network-bars" /> Exams Analysis
         </h4>
