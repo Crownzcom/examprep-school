@@ -291,8 +291,8 @@ const ExamsStats = () => {
           </div>
         )}
         {averageMarks !== null && (
-          <div style={{ width: "60%" }}>
-            <h5>
+          <div style={{ width: "60%" }} className="graph-container">
+            <h5 className="graph-title">
               Average Marks for Stream {selectedStream}: {averageMarks}
             </h5>
             <ResponsiveContainer width="100%" height={300}>
@@ -308,8 +308,8 @@ const ExamsStats = () => {
           </div>
         )}
         {overallAverageMarks !== null && (
-          <div style={{ width: "60%" }}>
-            <h5>
+          <div style={{ width: "60%" }} className="graph-container">
+            <h5 className="graph-title">
               Overall Average Marks for Class {selectedClass}:{" "}
               {overallAverageMarks}
             </h5>
@@ -326,7 +326,9 @@ const ExamsStats = () => {
         )}
         {bestStudentInClass && (
           <div className="mt-4">
-            <h5>Best Student in Class {selectedClass}:</h5>
+            <h5 className="table-title">
+              Best Student in Class {selectedClass}:
+            </h5>
             <p>
               Name: {bestStudentInClass.firstName} {bestStudentInClass.lastName}
               <br />
@@ -337,7 +339,9 @@ const ExamsStats = () => {
 
         {bestStudentInStream && (
           <div className="mt-4">
-            <h5>Best Student in Stream {selectedStream}:</h5>
+            <h5 className="table-title">
+              Best Student in Stream {selectedStream}:
+            </h5>
             <p>
               Name: {bestStudentInStream.firstName}{" "}
               {bestStudentInStream.lastName}
@@ -348,7 +352,9 @@ const ExamsStats = () => {
         )}
         {Object.keys(averageMarksPerSubject).length > 0 && (
           <div className="mt-4">
-            <h5>Average Marks per Subject for Stream {selectedStream}:</h5>
+            <h5 className="table-title">
+              Average Marks per Subject for Stream {selectedStream}:
+            </h5>
             <table className="table table-bordered">
               <thead>
                 <tr>
