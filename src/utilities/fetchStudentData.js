@@ -265,9 +265,7 @@ export const fetchStudents = async (refresh = true) => {
 
     if (refresh) {
       // console.log('Fetching students data from database due to refresh flag.');
-      const response = await fetch(
-        `http://localhost:3001/students/fetch-students`
-      );
+      const response = await fetch(`${serverUrl}/students/fetch-students`);
       const data = await response.json();
       if (response.ok) {
         await updateStudentsLocalDatabase(data.data);
@@ -409,7 +407,7 @@ function toTitleCase(text) {
  */
 export const fetchAndProcessStudentData = async () => {
   try {
-    await fetch("http://localhost:3001/students/fetch-students")
+    await fetch("${serverUrl}/students/fetch-students")
       .then((response) => {
         if (!response.ok) {
           throw new Error("Network response was not ok");

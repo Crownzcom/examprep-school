@@ -1,20 +1,21 @@
 .App {
-    background-color: hsl(236, 72%,
-79%),
-hsl(237, 63%, 64%);
-min-height: 100vh;
-display: flex;
-flex-direction: column;
+  background-color: hsl(236, 72%, 79%), hsl(237, 63%, 64%);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 .main-content {
-    flex: 1;
-    margin-top: 0.009rem;
+  flex: 1;
+  margin-top: 0.009rem;
 }
 
+ul#controlled-tab-example {
+  display: none;
+}
 
 @media (max-width: 768px) {
-    .main-content {
-        padding-top: 100px;
-    }
+  .main-content {
+    padding-top: 100px;
+  }
 }

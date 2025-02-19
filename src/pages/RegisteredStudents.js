@@ -1,14 +1,27 @@
 // src/pages/RegisteredStudents.js
-import React, { useState, useEffect } from 'react';
-import StudentContainer from '../components/admin/StudentContainer';
+import React, { useState, useEffect } from "react";
+import StudentContainer from "../components/admin/StudentContainer";
 
-function RegisteredStudents() {
-
-    return (
-        <div>
-            <StudentContainer />
-        </div>
-    );
+export function RegisteredStudents() {
+  return (
+    <div>
+      <StudentContainer />
+    </div>
+  );
 }
 
-export default RegisteredStudents;
+export function ExamsDone() {
+  return (
+    <div>
+      <StudentContainer />
+    </div>
+  );
+}
+
+export function InactiveStudents() {
+  return (
+    <div>
+      <StudentContainer />
+    </div>
+  );
+}

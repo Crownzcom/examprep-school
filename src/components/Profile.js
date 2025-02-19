@@ -10,11 +10,8 @@ import {
   Tab,
 } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faSchool,
-  faInfo
-} from "@fortawesome/free-solid-svg-icons";
-import { useAuth } from "../context/AuthContext.js"
+import { faSchool, faInfo } from "@fortawesome/free-solid-svg-icons";
+import { useAuth } from "../context/AuthContext.js";
 import storageUtil from "../utilities/storageUtil";
 import HeroHeader from "./HeroHeader";
 import "./Home.css";
@@ -26,9 +23,9 @@ const Profile = () => {
   console.log(userInfo);
 
   const sessionData = storageUtil.getItem("sessionInfo");
-  console.log('Session Data: ', sessionData);
+  console.log("Session Data: ", sessionData);
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('personalDetails');
+  const [activeTab, setActiveTab] = useState("personalDetails");
   //Check user type
   const isStudent = userInfo.userType === "student";
 
@@ -47,48 +44,43 @@ const Profile = () => {
         <ul className="list-group list-group-flush">
           <li className="list-group-item">
             <i className="bi me-2"></i>
-            <strong>Name: </strong> {userInfo.firstName} {userInfo.lastName} {userInfo.otherName || ""}
+            <strong>Name: </strong> {userInfo.firstName} {userInfo.lastName}{" "}
+            {userInfo.otherName || ""}
           </li>
-          {
-            sessionInfo.userId && (
-              <>
-                <li className="list-group-item">
-                  <i className="bi bi-building me-2"></i>
-                  <strong>ID No.:</strong> {sessionInfo.userId}
-                </li>
-              </>
-            )
-          }
+          {sessionInfo.userId && (
+            <>
+              <li className="list-group-item">
+                <i className="bi bi-building me-2"></i>
+                <strong>ID No.:</strong> {sessionInfo.userId}
+              </li>
+            </>
+          )}
 
-          {
-            userInfo.phone !== undefined ? userInfo.phone && (
-              <>
-                <li className="list-group-item">
-                  <i className="bi bi-geo-alt me-2"></i>
-                  <strong>Phone:</strong> {userInfo.phone}
-                </li>
-              </>
-            ) : null
-          }
-
-          {
-            isStudent && (
-              userInfo.gender && (
+          {userInfo.phone !== undefined
+            ? userInfo.phone && (
                 <>
                   <li className="list-group-item">
                     <i className="bi bi-geo-alt me-2"></i>
-                    <strong>Gender:</strong> {userInfo.gender}
+                    <strong>Phone:</strong> {userInfo.phone}
                   </li>
                 </>
               )
-            )
-          }
+            : null}
+
+          {isStudent && userInfo.gender && (
+            <>
+              <li className="list-group-item">
+                <i className="bi bi-geo-alt me-2"></i>
+                <strong>Gender:</strong> {userInfo.gender}
+              </li>
+            </>
+          )}
 
           {/* Additional student-specific content */}
         </ul>
       </Card.Body>
     </Card>
-  )
+  );
 
   const renderSchoolDetails = () => (
     <Card className="shadow-sm mb-4 profile-card">
@@ -112,18 +104,20 @@ const Profile = () => {
           </li>
           <li className="list-group-item">
             <i className="bi bi-building me-2"></i>
-            <strong>Email:</strong> {schoolInfo.email} | {schoolInfo.email2 ? schoolInfo.email2 : ''}
+            <strong>Email:</strong> {schoolInfo.email} |{" "}
+            {schoolInfo.email2 ? schoolInfo.email2 : ""}
           </li>
           <li className="list-group-item">
             <i className="bi bi-building me-2"></i>
-            <strong>Phone:</strong> {schoolInfo.phone} | {schoolInfo.phone2 ? schoolInfo.phone2 : ''}
+            <strong>Phone:</strong> {schoolInfo.phone} |{" "}
+            {schoolInfo.phone2 ? schoolInfo.phone2 : ""}
           </li>
 
           {/* Additional student-specific content */}
         </ul>
       </Card.Body>
     </Card>
-  )
+  );
 
   const renderStudentProfile = () => (
     <Card className="shadow-sm mb-4 profile-card">
@@ -157,7 +151,6 @@ const Profile = () => {
     </Card>
   );
 
-
   // Hero Header
   const renderHeroHeader = () => (
     <HeroHeader>
@@ -188,7 +181,9 @@ const Profile = () => {
           {isStudent && (
             <>
               <Nav.Item>
-                <Nav.Link eventKey="educationDetails">Education Details</Nav.Link>
+                <Nav.Link eventKey="educationDetails">
+                  Education Details
+                </Nav.Link>
               </Nav.Item>
             </>
           )}
@@ -197,17 +192,26 @@ const Profile = () => {
           </Nav.Item>
         </Nav>
         <Tab.Content>
-          <Tab.Pane eventKey="personalDetails" active={activeTab === 'personalDetails'}>
+          <Tab.Pane
+            eventKey="personalDetails"
+            active={activeTab === "personalDetails"}
+          >
             {renderPersonalDetails()}
           </Tab.Pane>
           {isStudent && (
             <>
-              <Tab.Pane eventKey="educationDetails" active={activeTab === 'educationDetails'}>
+              <Tab.Pane
+                eventKey="educationDetails"
+                active={activeTab === "educationDetails"}
+              >
                 {renderStudentProfile()}
               </Tab.Pane>
             </>
           )}
-          <Tab.Pane eventKey="schoolDetails" active={activeTab === 'schoolDetails'}>
+          <Tab.Pane
+            eventKey="schoolDetails"
+            active={activeTab === "schoolDetails"}
+          >
             {renderSchoolDetails()}
           </Tab.Pane>
         </Tab.Content>
@@ -215,6 +219,5 @@ const Profile = () => {
     </>
   );
 };
-
 
 export default Profile;

@@ -1,6 +1,6 @@
 .exams-stats-container {
   max-width: 1200px;
-  margin: 0 auto;
+  margin: 1.5rem auto;
   background: #f8f9fa;
   padding: 20px;
   border-radius: 10px;
@@ -67,15 +67,15 @@
   border: 1px solid #ced4da;
 }
 
-h3 {
+/* h3 {
   text-align: center;
   color: #007bff;
-}
+} */
 
-h5 {
+/* h5 {
   font-weight: bold;
   color: #343a40;
-}
+} */
 
 .table {
   background: white;

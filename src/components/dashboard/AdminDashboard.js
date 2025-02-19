@@ -4,16 +4,10 @@ import NavigationCard from "./NavigationCard"; // Import the NavigationCard comp
 import {
   faUsers,
   faUserCheck,
-  faUserPlus,
   faUserSlash,
-  faMoneyCheckAlt,
-  faCheckCircle,
-  faTimesCircle,
-  faBan,
   faBarChart,
 } from "@fortawesome/free-solid-svg-icons";
 import db from "../../db"; // Import the database configuration
-import { icon } from "@fortawesome/fontawesome-svg-core";
 
 const AdminDashboard = () => {
   const [key, setKey] = useState("students");
@@ -25,22 +19,26 @@ const AdminDashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch student counts
-        setRegisteredCount(await db.students.count());
-        setExamsDone(
-          await db.students
-            .filter((student) => {
-              try {
-                const results = JSON.parse(student.Results);
-                return Array.isArray(results) && results.length > 0;
-              } catch (e) {
-                // Handle case where parsing fails, possibly due to malformed JSON
-                return false;
-              }
-            })
-            .count()
-        );
-        // setInactiveCount(await db.students.where('accountStatus').equals('Inactive').count());
+        // Get total number of students
+        const totalStudents = await db.students.count();
+
+        // Get number of students who have taken exams
+        const studentsWithExams = await db.students
+          .filter((student) => {
+            try {
+              const results = JSON.parse(student.Results);
+              return Array.isArray(results) && results.length > 0;
+            } catch (e) {
+              return false;
+            }
+          })
+          .count();
+
+        const inactiveStudents = totalStudents - studentsWithExams;
+
+        setRegisteredCount(totalStudents);
+        setExamsDone(studentsWithExams);
+        setInactiveCount(inactiveStudents);
       } catch (e) {
         console.error("Error fetching data from index db on component load", e);
       }
@@ -51,16 +49,15 @@ const AdminDashboard = () => {
 
   return (
     <Container fluid>
-      <div
-        className="mb-4"
+      {/* Move activeKey and onSelect to the Tabs component */}
+      <Tabs
         id="controlled-tab-example"
         activeKey={key}
         onSelect={(k) => setKey(k)}
         variant="pills"
       >
-        <div eventKey="students" title="Students">
+        <Tab eventKey="students" title="Students">
           <h5 className="title-2">Metrics: Students & Exams</h5>
-
           <Row
             className="justify-content-md-center"
             style={{ marginTop: "20px", gap: "20px" }}
@@ -72,6 +69,7 @@ const AdminDashboard = () => {
                 borderColor: "#FF6347",
                 link: "/registered-students",
                 number: registeredCount,
+                gradient: "linear-gradient(135deg, #FF7889 0%, #8A5082 100%)",
               },
               {
                 title: "Exams",
@@ -79,6 +77,7 @@ const AdminDashboard = () => {
                 borderColor: "#FF4500",
                 link: "/exams-done",
                 number: examsDone,
+                gradient: "linear-gradient(135deg, #FF4500 0%, #C9D787 100%)",
               },
               {
                 title: "Inactive Students",
@@ -86,24 +85,23 @@ const AdminDashboard = () => {
                 borderColor: "#20B2AA",
                 link: "/inactive",
                 number: inactiveCount,
+                gradient: "linear-gradient(135deg, #20B2AA 0%, #8A5082 100%)",
               },
               {
                 title: "Examination Analysis",
                 icon: faBarChart,
                 borderColor: "#008080",
                 link: "/exams-stats",
+                gradient: "linear-gradient(135deg, #008080 0%, #C9D787 100%)",
               },
             ].map((card) => (
               <Col md={3} key={card.title}>
-                <NavigationCard
-                  {...card}
-                  gradient={`linear-gradient(135deg, ${card.borderColor} 0%, #008080 100%)`}
-                />
+                <NavigationCard {...card} />
               </Col>
             ))}
           </Row>
-        </div>
-      </div>
+        </Tab>
+      </Tabs>
     </Container>
   );
 };

@@ -92,7 +92,7 @@ const ScheduleExam = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:3001/exam/fetch-exam?collection_id=${examData.examTableId}&subjectName=${examData.subjectName}`
+        `${serverUrl}/exam/fetch-exam?collection_id=${examData.examTableId}&subjectName=${examData.subjectName}`
       );
       if (!response.ok) {
         throw new Error("Network response was not ok");

@@ -30,7 +30,11 @@ import StudentDetails from "./components/StudentDetails";
 import LinkedStudents from "./components/LinkedStudents";
 import EditProfile from "./components/EditProfile";
 import Answers from "./components/renderAnswer/Answers";
-import RegisteredStudents from "./pages/RegisteredStudents";
+import {
+  RegisteredStudents,
+  ExamsDone,
+  InactiveStudents,
+} from "./pages/RegisteredStudents";
 import ScheduleExam from "./components/scheduleExam/ScheduleExam.js";
 import NotFoundPage from "./components/NotFoundPage";
 import CreateAdmin from "./components/initiate/CreateAdmin.js";
@@ -165,6 +169,22 @@ function App() {
                 element={
                   <PrivateRoute>
                     <RegisteredStudents />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/exams-done"
+                element={
+                  <PrivateRoute>
+                    <ExamsDone />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/inactive"
+                element={
+                  <PrivateRoute>
+                    <InactiveStudents />
                   </PrivateRoute>
                 }
               />
