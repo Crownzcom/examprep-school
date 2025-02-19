@@ -73,20 +73,20 @@ const StudentContainer = () => {
   const [refreshResults, setRefreshResults] = useState(false);
   const [download, setDownload] = useState(false);
   const [activeTab, setActiveTab] = useState("all"); // going to work for all, active and inactive students\
-  const location = useLocation;
+  const location = useLocation();
 
   const itemsPerPage = 10;
 
   useEffect(() => {
     const path = location.pathname;
     if (path.includes("exams-done")) {
-      setActiveTab("Active");
+      setActiveTab("active");
     } else if (path.includes("inactive")) {
       setActiveTab("inactive");
     } else {
       setActiveTab("all");
     }
-  });
+  }, [location]);
 
   useEffect(() => {
     async function InitialloadStudents() {
@@ -106,6 +106,8 @@ const StudentContainer = () => {
       try {
         setLoader(true);
         let loadedStudents;
+
+        // First get the students based on the filter criteria
         switch (filter) {
           case "id":
             const student = await getStudentById(filterValue);
@@ -134,6 +136,24 @@ const StudentContainer = () => {
             loadedStudents = await getAllStudents();
             break;
         }
+
+        // filter based on activeTab
+        switch (activeTab) {
+          case "active":
+            loadedStudents = loadedStudents.filter(
+              (student) => student.Results && student.Results.length > 0
+            );
+            break;
+          case "inactive":
+            loadedStudents = loadedStudents.filter(
+              (student) => !student.Results || student.Results.length === 0
+            );
+            break;
+          case "all":
+          default:
+            break;
+        }
+
         setStudents(loadedStudents);
       } catch (err) {
         console.error("Error loading students:", err);
@@ -148,7 +168,7 @@ const StudentContainer = () => {
     } else {
       loadStudents();
     }
-  }, [filter, filterValue]);
+  }, [filter, filterValue, activeTab]);
 
   const refreshStudentsData = async () => {
     try {
