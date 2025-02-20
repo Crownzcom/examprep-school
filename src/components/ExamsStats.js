@@ -325,8 +325,8 @@ const ExamsStats = () => {
           </div>
         )}
         {bestStudentInClass && (
-          <div className="mt-4">
-            <h5 className="table-title">
+          <div className="graph-container">
+            <h5 className="graph-title">
               Best Student in Class {selectedClass}:
             </h5>
             <p>
@@ -338,8 +338,8 @@ const ExamsStats = () => {
         )}
 
         {bestStudentInStream && (
-          <div className="mt-4">
-            <h5 className="table-title">
+          <div className="graph-container ">
+            <h5 className="graph-title">
               Best Student in Stream {selectedStream}:
             </h5>
             <p>
