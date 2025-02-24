@@ -63,8 +63,9 @@ const {
 //   .setProject(APPWRITE_PROJECT_ID)
 
 const client = new Client()
-  .setEndpoint("https://appwrite.exampreptutor.com/v1")
-  .setProject("66ac8ccd001f073c0692");
+  // .setEndpoint("https://appwrite.exampreptutor.com/v1")
+  .setEndpoint("http://localhost/v1")
+  .setProject("67bc23430000d32aa7e1");
 
 const account = new Account(client);
 const databases = new Databases(client);
