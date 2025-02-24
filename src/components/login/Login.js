@@ -141,7 +141,7 @@ const Login = () => {
 
         await account.deleteSessions();
 
-        setTimeout(() => {}, 500);
+        setTimeout(() => {}, 1000);
       } catch (sessionError) {
         console.log("Failed to delete existing session", sessionError);
       }
